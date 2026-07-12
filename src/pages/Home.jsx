@@ -4,11 +4,11 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 
 const CATEGORIES = [
-  { name: 'Légumes', icon: '🍅', color: 'var(--tomato)' },
-  { name: 'Fruits', icon: '🥭', color: 'var(--leaf)' },
-  { name: 'Céréales', icon: '🌾', color: 'var(--ochre)' },
-  { name: 'Épices', icon: '🧅', color: '#8E6BA8' },
-  { name: 'Viande/Poisson', icon: '🐟', color: 'var(--indigo)' },
+  { name: 'Légumes', icon: '🍅', color: 'var(--tomato)', image: 'https://images.pexels.com/photos/1400172/pexels-photo-1400172.jpeg?auto=compress&cs=tinysrgb&w=200' },
+  { name: 'Fruits', icon: '🥭', color: 'var(--leaf)', image: 'https://images.pexels.com/photos/3978830/pexels-photo-3978830.jpeg?auto=compress&cs=tinysrgb&w=200' },
+  { name: 'Céréales', icon: '🌾', color: 'var(--ochre)', image: 'https://images.pexels.com/photos/18328392/pexels-photo-18328392.jpeg?auto=compress&cs=tinysrgb&w=200' },
+  { name: 'Épices', icon: '🧅', color: '#8E6BA8', image: 'https://images.pexels.com/photos/6302105/pexels-photo-6302105.jpeg?auto=compress&cs=tinysrgb&w=200' },
+  { name: 'Viande/Poisson', icon: '🐟', color: 'var(--indigo)', image: 'https://images.pexels.com/photos/19311538/pexels-photo-19311538.jpeg?auto=compress&cs=tinysrgb&w=200' },
 ];
 
 export default function Home() {
@@ -38,8 +38,18 @@ export default function Home() {
           <Link key={c.name} to="/catalogue" style={{ textAlign: 'center' }}>
             <div style={{
               width: 64, height: 64, borderRadius: 18, background: c.color,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, marginBottom: 6
-            }}>{c.icon}</div>
+              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, marginBottom: 6,
+              overflow: 'hidden'
+            }}>
+              {c.image ? (
+                <img
+                  src={c.image}
+                  alt={c.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.textContent = c.icon; }}
+                />
+              ) : c.icon}
+            </div>
             <span style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 500 }}>{c.name}</span>
           </Link>
         ))}
