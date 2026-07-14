@@ -3,13 +3,38 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 
-const CATEGORIES = [
+const FRESH_CATEGORIES = [
   { name: 'Légumes', icon: '🍅', color: 'var(--tomato)', image: 'https://images.pexels.com/photos/1400172/pexels-photo-1400172.jpeg?auto=compress&cs=tinysrgb&w=200' },
   { name: 'Fruits', icon: '🥭', color: 'var(--leaf)', image: 'https://images.pexels.com/photos/3978830/pexels-photo-3978830.jpeg?auto=compress&cs=tinysrgb&w=200' },
+];
+
+const OTHER_CATEGORIES = [
   { name: 'Céréales', icon: '🌾', color: 'var(--ochre)', image: 'https://images.pexels.com/photos/18328392/pexels-photo-18328392.jpeg?auto=compress&cs=tinysrgb&w=200' },
   { name: 'Épices', icon: '🧅', color: '#8E6BA8', image: 'https://images.pexels.com/photos/6302105/pexels-photo-6302105.jpeg?auto=compress&cs=tinysrgb&w=200' },
   { name: 'Viande/Poisson', icon: '🐟', color: 'var(--indigo)', image: 'https://images.pexels.com/photos/19311538/pexels-photo-19311538.jpeg?auto=compress&cs=tinysrgb&w=200' },
 ];
+
+function CategoryTile({ c }) {
+  return (
+    <Link to="/catalogue" style={{ textAlign: 'center' }}>
+      <div style={{
+        width: 64, height: 64, borderRadius: 18, background: c.color,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, marginBottom: 6,
+        overflow: 'hidden'
+      }}>
+        {c.image ? (
+          <img
+            src={c.image}
+            alt={c.name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.textContent = c.icon; }}
+          />
+        ) : c.icon}
+      </div>
+      <span style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 500 }}>{c.name}</span>
+    </Link>
+  );
+}
 
 export default function Home() {
   const { token } = useAuth();
@@ -32,27 +57,17 @@ export default function Home() {
         </div>
       </Link>
 
-      <h3 style={{ fontSize: 15, marginBottom: 14, color: 'var(--ink-soft)', fontFamily: 'JetBrains Mono', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Catégories</h3>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+        <span style={{ fontSize: 15 }}>🌱</span>
+        <h3 style={{ fontSize: 15, color: 'var(--leaf-deep)', fontFamily: 'JetBrains Mono', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fruits & légumes frais</h3>
+      </div>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 30, flexWrap: 'wrap' }}>
+        {FRESH_CATEGORIES.map((c) => <CategoryTile key={c.name} c={c} />)}
+      </div>
+
+      <h3 style={{ fontSize: 15, marginBottom: 14, color: 'var(--ink-soft)', fontFamily: 'JetBrains Mono', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Autres produits</h3>
       <div style={{ display: 'flex', gap: 16, marginBottom: 34, flexWrap: 'wrap' }}>
-        {CATEGORIES.map((c) => (
-          <Link key={c.name} to="/catalogue" style={{ textAlign: 'center' }}>
-            <div style={{
-              width: 64, height: 64, borderRadius: 18, background: c.color,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, marginBottom: 6,
-              overflow: 'hidden'
-            }}>
-              {c.image ? (
-                <img
-                  src={c.image}
-                  alt={c.name}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={(e) => { e.target.style.display = 'none'; e.target.parentNode.textContent = c.icon; }}
-                />
-              ) : c.icon}
-            </div>
-            <span style={{ fontSize: 12, color: 'var(--ink-soft)', fontWeight: 500 }}>{c.name}</span>
-          </Link>
-        ))}
+        {OTHER_CATEGORIES.map((c) => <CategoryTile key={c.name} c={c} />)}
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>

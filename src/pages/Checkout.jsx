@@ -20,6 +20,7 @@ export default function Checkout() {
   const [address, setAddress] = useState('');
   const [method, setMethod] = useState('orange_money');
   const [phone, setPhone] = useState('');
+  const [wantsBio, setWantsBio] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -33,6 +34,7 @@ export default function Checkout() {
         order_type: 'catalog',
         items: items.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
         delivery_fee: DELIVERY_FEE,
+        wants_bio: wantsBio,
       });
       clearCart();
       navigate('/confirmation', { state: { orderNumber: order.order_number, orderId: order.id } });
@@ -77,6 +79,37 @@ export default function Checkout() {
           <input style={inputStyle} value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+223 70 00 00 00" />
         </Field>
       )}
+
+      <div style={{ fontSize: 13, fontWeight: 700, margin: '18px 0 10px' }}>Préférez-vous des produits bio ?</div>
+      <div style={{ display: 'flex', gap: 10, marginBottom: 4 }}>
+        <button
+          type="button"
+          onClick={() => setWantsBio(true)}
+          style={{
+            flex: 1, padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            border: `1.5px solid ${wantsBio === true ? 'var(--leaf)' : 'var(--line)'}`,
+            background: wantsBio === true ? 'rgba(63,122,84,0.08)' : 'var(--card)',
+            color: wantsBio === true ? 'var(--leaf-deep)' : 'var(--ink)',
+          }}
+        >
+          🌱 Oui, si possible
+        </button>
+        <button
+          type="button"
+          onClick={() => setWantsBio(false)}
+          style={{
+            flex: 1, padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+            border: `1.5px solid ${wantsBio === false ? 'var(--indigo)' : 'var(--line)'}`,
+            background: wantsBio === false ? 'rgba(28,37,65,0.05)' : 'var(--card)',
+            color: 'var(--ink)',
+          }}
+        >
+          Peu importe
+        </button>
+      </div>
+      <p style={{ fontSize: 11, color: 'var(--ink-soft)', marginBottom: 16 }}>
+        Selon disponibilité chez nos vendeurs — sans surcoût garanti.
+      </p>
 
       <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 14, padding: 16, margin: '18px 0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: 'var(--ink-soft)', marginBottom: 8 }}>

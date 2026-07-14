@@ -8,6 +8,7 @@ export default function FreeRequest() {
   const { token } = useAuth();
   const navigate = useNavigate();
   const [form, setForm] = useState({ description: '', budget: '', address: '' });
+  const [wantsBio, setWantsBio] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -20,6 +21,7 @@ export default function FreeRequest() {
         order_type: 'free_request',
         free_request_description: form.description,
         free_request_budget: form.budget ? Number(form.budget) : null,
+        wants_bio: wantsBio,
       });
       navigate('/confirmation', { state: { orderNumber: order.order_number, orderId: order.id } });
     } catch (err) {
@@ -56,6 +58,34 @@ export default function FreeRequest() {
         <Field label="Adresse de livraison">
           <input style={inputStyle} required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Ex : Restaurant Teriya, Hamdallaye" />
         </Field>
+
+        <div style={{ fontSize: 13, fontWeight: 700, margin: '4px 0 10px' }}>Préférez-vous des produits bio ?</div>
+        <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
+          <button
+            type="button"
+            onClick={() => setWantsBio(true)}
+            style={{
+              flex: 1, padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              border: `1.5px solid ${wantsBio === true ? 'var(--leaf)' : 'var(--line)'}`,
+              background: wantsBio === true ? 'rgba(63,122,84,0.08)' : 'var(--card)',
+              color: wantsBio === true ? 'var(--leaf-deep)' : 'var(--ink)',
+            }}
+          >
+            🌱 Oui, si possible
+          </button>
+          <button
+            type="button"
+            onClick={() => setWantsBio(false)}
+            style={{
+              flex: 1, padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+              border: `1.5px solid ${wantsBio === false ? 'var(--indigo)' : 'var(--line)'}`,
+              background: wantsBio === false ? 'rgba(28,37,65,0.05)' : 'var(--card)',
+              color: 'var(--ink)',
+            }}
+          >
+            Peu importe
+          </button>
+        </div>
 
         <div style={{ display: 'flex', gap: 10, alignItems: 'center', background: '#E5EEE8', border: '1px solid #BFDBC9', borderRadius: 10, padding: '11px 14px', fontSize: 12, color: 'var(--leaf-deep)', marginBottom: 18 }}>
           ℹ Notre équipe confirme la disponibilité et le prix avant de valider votre commande.
