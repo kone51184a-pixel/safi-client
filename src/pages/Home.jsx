@@ -8,15 +8,9 @@ const FRESH_CATEGORIES = [
   { name: 'Fruits', icon: '🥭', color: 'var(--leaf)', image: 'https://images.pexels.com/photos/3978830/pexels-photo-3978830.jpeg?auto=compress&cs=tinysrgb&w=200' },
 ];
 
-const OTHER_CATEGORIES = [
-  { name: 'Céréales', icon: '🌾', color: 'var(--ochre)', image: 'https://images.pexels.com/photos/18328392/pexels-photo-18328392.jpeg?auto=compress&cs=tinysrgb&w=200' },
-  { name: 'Épices', icon: '🧅', color: '#8E6BA8', image: 'https://images.pexels.com/photos/6302105/pexels-photo-6302105.jpeg?auto=compress&cs=tinysrgb&w=200' },
-  { name: 'Viande/Poisson', icon: '🐟', color: 'var(--indigo)', image: 'https://images.pexels.com/photos/19311538/pexels-photo-19311538.jpeg?auto=compress&cs=tinysrgb&w=200' },
-];
-
 function CategoryTile({ c }) {
   return (
-    <Link to="/catalogue" style={{ textAlign: 'center' }}>
+    <Link to={`/catalogue?categorie=${encodeURIComponent(c.name)}`} style={{ textAlign: 'center' }}>
       <div style={{
         width: 64, height: 64, borderRadius: 18, background: c.color,
         display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 26, marginBottom: 6,
@@ -36,6 +30,8 @@ function CategoryTile({ c }) {
   );
 }
 
+const FRESH_NAMES = ['Légumes', 'Fruits'];
+
 export default function Home() {
   const { token } = useAuth();
   const [products, setProducts] = useState([]);
@@ -44,6 +40,8 @@ export default function Home() {
     if (!token) return;
     api.getProducts(token).then(setProducts).catch(() => {});
   }, [token]);
+
+  const freshProducts = products.filter((p) => FRESH_NAMES.includes(p.category_name));
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '30px 24px' }}>
@@ -59,15 +57,10 @@ export default function Home() {
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
         <span style={{ fontSize: 15 }}>🌱</span>
-        <h3 style={{ fontSize: 15, color: 'var(--leaf-deep)', fontFamily: 'JetBrains Mono', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fruits & légumes frais</h3>
+        <h3 style={{ fontSize: 15, color: 'var(--leaf-deep)', fontFamily: 'JetBrains Mono', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fruits & légumes</h3>
       </div>
-      <div style={{ display: 'flex', gap: 16, marginBottom: 30, flexWrap: 'wrap' }}>
-        {FRESH_CATEGORIES.map((c) => <CategoryTile key={c.name} c={c} />)}
-      </div>
-
-      <h3 style={{ fontSize: 15, marginBottom: 14, color: 'var(--ink-soft)', fontFamily: 'JetBrains Mono', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Autres produits</h3>
       <div style={{ display: 'flex', gap: 16, marginBottom: 34, flexWrap: 'wrap' }}>
-        {OTHER_CATEGORIES.map((c) => <CategoryTile key={c.name} c={c} />)}
+        {FRESH_CATEGORIES.map((c) => <CategoryTile key={c.name} c={c} />)}
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
@@ -79,11 +72,11 @@ export default function Home() {
         <p style={{ fontSize: 13, color: 'var(--ink-soft)' }}>
           <Link to="/login" style={{ color: 'var(--tomato)', fontWeight: 600 }}>Connecte-toi</Link> pour voir le catalogue.
         </p>
-      ) : products.length === 0 ? (
+      ) : freshProducts.length === 0 ? (
         <p style={{ fontSize: 13, color: 'var(--ink-soft)' }}>Aucun produit disponible pour l'instant.</p>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: 16 }}>
-          {products.slice(0, 8).map((p) => (
+          {freshProducts.slice(0, 8).map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>

@@ -35,7 +35,16 @@ export default function Orders() {
               <StatusPill status={o.status} />
             </div>
             <div style={{ fontSize: 12, color: 'var(--ink-soft)' }}>
-              {o.order_type === 'free_request' ? o.free_request_description : `${o.total ? Number(o.total).toLocaleString() + ' F' : ''}`}
+              {o.order_type === 'free_request' ? (
+                <>
+                  {o.free_request_description}
+                  {o.total && Number(o.total) > 0 && (
+                    <span style={{ fontWeight: 600, color: 'var(--tomato)' }}> · {Number(o.total).toLocaleString()} F</span>
+                  )}
+                </>
+              ) : (
+                o.total ? `${Number(o.total).toLocaleString()} F` : ''
+              )}
             </div>
           </Link>
         ))

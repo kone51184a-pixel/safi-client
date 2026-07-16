@@ -59,7 +59,7 @@ export default function FreeRequest() {
           <input style={inputStyle} required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Ex : Restaurant Teriya, Hamdallaye" />
         </Field>
 
-        <div style={{ fontSize: 13, fontWeight: 700, margin: '4px 0 10px' }}>Préférez-vous des produits bio ?</div>
+        <div style={{ fontSize: 13, fontWeight: 700, margin: '4px 0 10px' }}>Produit bio ?</div>
         <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
           <button
             type="button"
@@ -71,7 +71,7 @@ export default function FreeRequest() {
               color: wantsBio === true ? 'var(--leaf-deep)' : 'var(--ink)',
             }}
           >
-            🌱 Oui, si possible
+            🌱 Oui
           </button>
           <button
             type="button"
@@ -83,7 +83,7 @@ export default function FreeRequest() {
               color: 'var(--ink)',
             }}
           >
-            Peu importe
+            Non
           </button>
         </div>
 

@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import { useSettings } from '../context/SettingsContext';
 import { api } from '../api/client';
 import { Button, Field, inputStyle } from '../components/UI';
-
-const DELIVERY_FEE = 1000;
 
 const PAYMENT_METHODS = [
   { id: 'orange_money', label: 'Orange Money', icon: 'OM', color: 'var(--tomato)' },
@@ -16,6 +15,7 @@ const PAYMENT_METHODS = [
 export default function Checkout() {
   const { token } = useAuth();
   const { items, subtotal, clearCart } = useCart();
+  const { deliveryFee } = useSettings();
   const navigate = useNavigate();
   const [address, setAddress] = useState('');
   const [method, setMethod] = useState('orange_money');
@@ -24,7 +24,7 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const total = subtotal + DELIVERY_FEE;
+  const total = subtotal + deliveryFee;
 
   async function handleConfirm() {
     setLoading(true);
@@ -33,7 +33,7 @@ export default function Checkout() {
       const order = await api.createOrder(token, {
         order_type: 'catalog',
         items: items.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
-        delivery_fee: DELIVERY_FEE,
+        delivery_fee: deliveryFee,
         wants_bio: wantsBio,
       });
       clearCart();
@@ -116,7 +116,7 @@ export default function Checkout() {
           <span>Articles</span><span className="mono">{subtotal.toLocaleString()} F</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12.5, color: 'var(--ink-soft)', marginBottom: 8 }}>
-          <span>Livraison</span><span className="mono">{DELIVERY_FEE.toLocaleString()} F</span>
+          <span>Livraison</span><span className="mono">{deliveryFee.toLocaleString()} F</span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '1px dashed var(--line)', fontWeight: 700, fontSize: 14 }}>
           <span>Total à payer</span><span className="mono">{total.toLocaleString()} F</span>

@@ -31,4 +31,6 @@ export const api = {
   createOrder: (token, order) => request('/orders', { method: 'POST', body: order, token }),
   getOrders: (token) => request('/orders', { token }),
   getOrder: (token, id) => request(`/orders/${id}`, { token }),
+
+  getSettings: (token) => request('/settings', { token }),
 };

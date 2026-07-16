@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import { SettingsProvider } from './context/SettingsContext';
 import RequireAuth from './components/RequireAuth';
 import NavBar from './components/NavBar';
 
@@ -28,25 +29,27 @@ function Layout({ children }) {
 export default function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <BrowserRouter>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/inscription" element={<Register />} />
-              <Route path="/catalogue" element={<Catalog />} />
-              <Route path="/produit/:id" element={<RequireAuth><ProductDetail /></RequireAuth>} />
-              <Route path="/panier" element={<Cart />} />
-              <Route path="/commande" element={<RequireAuth><Checkout /></RequireAuth>} />
-              <Route path="/confirmation" element={<RequireAuth><OrderSuccess /></RequireAuth>} />
-              <Route path="/demande-libre" element={<RequireAuth><FreeRequest /></RequireAuth>} />
-              <Route path="/commandes" element={<RequireAuth><Orders /></RequireAuth>} />
-              <Route path="/commandes/:id" element={<RequireAuth><OrderDetail /></RequireAuth>} />
-            </Routes>
-          </Layout>
-        </BrowserRouter>
-      </CartProvider>
+      <SettingsProvider>
+        <CartProvider>
+          <BrowserRouter>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/inscription" element={<Register />} />
+                <Route path="/catalogue" element={<Catalog />} />
+                <Route path="/produit/:id" element={<RequireAuth><ProductDetail /></RequireAuth>} />
+                <Route path="/panier" element={<Cart />} />
+                <Route path="/commande" element={<RequireAuth><Checkout /></RequireAuth>} />
+                <Route path="/confirmation" element={<RequireAuth><OrderSuccess /></RequireAuth>} />
+                <Route path="/demande-libre" element={<RequireAuth><FreeRequest /></RequireAuth>} />
+                <Route path="/commandes" element={<RequireAuth><Orders /></RequireAuth>} />
+                <Route path="/commandes/:id" element={<RequireAuth><OrderDetail /></RequireAuth>} />
+              </Routes>
+            </Layout>
+          </BrowserRouter>
+        </CartProvider>
+      </SettingsProvider>
     </AuthProvider>
   );
 }

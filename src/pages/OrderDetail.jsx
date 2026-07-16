@@ -40,6 +40,16 @@ export default function OrderDetail() {
         <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 12, padding: 14, marginBottom: 24, fontSize: 13 }}>
           <div style={{ fontWeight: 600, marginBottom: 4 }}>Votre demande :</div>
           <div style={{ color: 'var(--ink-soft)' }}>{order.free_request_description}</div>
+          {order.total && Number(order.total) > 0 ? (
+            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--line)', display: 'flex', justifyContent: 'space-between' }}>
+              <span style={{ fontWeight: 600 }}>Prix estimé</span>
+              <span className="mono" style={{ fontWeight: 700, color: 'var(--tomato)' }}>{Number(order.total).toLocaleString()} F</span>
+            </div>
+          ) : (
+            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--line)', fontSize: 11.5, color: 'var(--ink-soft)' }}>
+              💬 Prix en cours de confirmation par notre équipe
+            </div>
+          )}
         </div>
       )}
 

@@ -1,17 +1,31 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 import { ProductCard } from './Home';
 import { inputStyle } from '../components/UI';
 
-const FRESH_NAMES = ['Légumes', 'Fruits'];
+const TABS = [
+  { key: 'all', label: 'Tous' },
+  { key: 'Fruits', label: '🥭 Fruits' },
+  { key: 'Légumes', label: '🍅 Légumes' },
+];
 
 export default function Catalog() {
   const { token } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState('all'); // all | fresh | other
+
+  const urlCategory = searchParams.get('categorie');
+  const [tab, setTab] = useState(urlCategory && TABS.some((t) => t.key === urlCategory) ? urlCategory : 'all');
+
+  useEffect(() => {
+    if (urlCategory && TABS.some((t) => t.key === urlCategory)) {
+      setTab(urlCategory);
+    }
+  }, [urlCategory]);
 
   useEffect(() => {
     if (!token) return;
@@ -21,31 +35,35 @@ export default function Catalog() {
       .finally(() => setLoading(false));
   }, [token, search]);
 
-  const filtered = products.filter((p) => {
-    if (tab === 'all') return true;
-    const isFresh = FRESH_NAMES.includes(p.category_name);
-    return tab === 'fresh' ? isFresh : !isFresh;
-  });
+  function selectTab(key) {
+    setTab(key);
+    if (key === 'all') {
+      searchParams.delete('categorie');
+    } else {
+      searchParams.set('categorie', key);
+    }
+    setSearchParams(searchParams);
+  }
+
+  // Le catalogue ne vend pour l'instant que fruits et légumes
+  const produce = products.filter((p) => p.category_name === 'Fruits' || p.category_name === 'Légumes');
+  const filtered = tab === 'all' ? produce : produce.filter((p) => p.category_name === tab);
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '30px 24px' }}>
       <h2 style={{ fontSize: 20, marginBottom: 14 }}>Catalogue</h2>
       <input
         style={{ ...inputStyle, maxWidth: 320, marginBottom: 18 }}
-        placeholder="Rechercher un produit (tomates, riz…)"
+        placeholder="Rechercher un produit (tomates, mangues…)"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
 
       <div style={{ display: 'flex', gap: 10, marginBottom: 22, flexWrap: 'wrap' }}>
-        {[
-          { key: 'all', label: 'Tous' },
-          { key: 'fresh', label: '🌱 Fruits & légumes' },
-          { key: 'other', label: 'Autres produits' },
-        ].map((t) => (
+        {TABS.map((t) => (
           <button
             key={t.key}
-            onClick={() => setTab(t.key)}
+            onClick={() => selectTab(t.key)}
             style={{
               padding: '8px 16px', borderRadius: 20, fontSize: 12.5, fontWeight: 600, cursor: 'pointer',
               border: `1.5px solid ${tab === t.key ? 'var(--leaf)' : 'var(--line)'}`,

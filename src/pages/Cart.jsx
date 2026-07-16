@@ -1,11 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
+import { useSettings } from '../context/SettingsContext';
 import { Button } from '../components/UI';
-
-const DELIVERY_FEE = 1000;
 
 export default function Cart() {
   const { items, updateQuantity, removeItem, subtotal } = useCart();
+  const { deliveryFee } = useSettings();
   const navigate = useNavigate();
 
   if (items.length === 0) {
@@ -19,7 +19,7 @@ export default function Cart() {
     );
   }
 
-  const total = subtotal + DELIVERY_FEE;
+  const total = subtotal + deliveryFee;
 
   return (
     <div style={{ maxWidth: 600, margin: '0 auto', padding: '30px 24px' }}>
@@ -50,7 +50,7 @@ export default function Cart() {
 
       <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 14, padding: 18, marginTop: 20 }}>
         <SummaryLine label="Sous-total" value={subtotal} />
-        <SummaryLine label="Frais de livraison" value={DELIVERY_FEE} />
+        <SummaryLine label="Frais de livraison" value={deliveryFee} />
         <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 10, marginTop: 6, borderTop: '1px dashed var(--line)', fontWeight: 700, fontSize: 15 }}>
           <span>Total</span><span className="mono">{total.toLocaleString()} F</span>
         </div>
