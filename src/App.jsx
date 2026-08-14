@@ -16,6 +16,7 @@ import OrderSuccess from './pages/OrderSuccess';
 import FreeRequest from './pages/FreeRequest';
 import Orders from './pages/Orders';
 import OrderDetail from './pages/OrderDetail';
+import DelivererResponse from './pages/DelivererResponse';
 
 function Layout({ children }) {
   return (
@@ -45,6 +46,7 @@ export default function App() {
                 <Route path="/demande-libre" element={<RequireAuth><FreeRequest /></RequireAuth>} />
                 <Route path="/commandes" element={<RequireAuth><Orders /></RequireAuth>} />
                 <Route path="/commandes/:id" element={<RequireAuth><OrderDetail /></RequireAuth>} />
+                <Route path="/livreur/:orderId" element={<DelivererResponse />} />
               </Routes>
             </Layout>
           </BrowserRouter>

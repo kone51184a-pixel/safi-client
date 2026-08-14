@@ -41,6 +41,11 @@ export default function ProductDetail() {
           <div style={{ fontFamily: 'JetBrains Mono', fontSize: 16, color: 'var(--tomato)', fontWeight: 600, marginTop: 4 }}>
             {Number(product.price).toLocaleString()} F / {product.unit}
           </div>
+          {product.price_bio && (
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--leaf)', fontWeight: 600, marginTop: 2 }}>
+              🌱 Bio : {Number(product.price_bio).toLocaleString()} F / {product.unit}
+            </div>
+          )}
         </div>
       </div>
 
@@ -52,19 +57,6 @@ export default function ProductDetail() {
           <button onClick={() => setQuantity(quantity + 1)} style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid var(--line)', background: 'var(--card)' }}>+</button>
         </div>
       </div>
-
-      {product.vendor_name && (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 14, background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 12, marginBottom: 20 }}>
-          <div style={{
-            width: 38, height: 38, borderRadius: 10, background: 'linear-gradient(135deg, var(--ochre), var(--tomato))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 700, fontFamily: 'Space Grotesk'
-          }}>{product.vendor_name[0]}</div>
-          <div>
-            <div style={{ fontSize: 13, fontWeight: 600 }}>{product.vendor_name}</div>
-            <div style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>{product.market_zone}</div>
-          </div>
-        </div>
-      )}
 
       {product.description && (
         <p style={{ fontSize: 13, color: 'var(--ink-soft)', lineHeight: 1.6, marginBottom: 24 }}>{product.description}</p>

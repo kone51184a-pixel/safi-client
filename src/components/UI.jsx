@@ -60,8 +60,8 @@ const STATUS_ORDER = ['pending', 'confirmed', 'picked_up', 'in_delivery', 'deliv
 const STATUS_LABELS = {
   pending: 'Demande reçue',
   awaiting_matching: 'Demande reçue',
-  confirmed: 'Commande confirmée avec le vendeur',
-  picked_up: 'Récupérée chez le vendeur',
+  confirmed: 'Commande confirmée',
+  picked_up: 'En préparation',
   in_delivery: 'En livraison',
   delivered: 'Livrée',
 };

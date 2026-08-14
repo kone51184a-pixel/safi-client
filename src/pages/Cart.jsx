@@ -33,8 +33,7 @@ export default function Cart() {
             ) : '🍅'}
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13.5, fontWeight: 600 }}>{product.name}</div>
-            <div style={{ fontSize: 11, color: 'var(--ink-soft)', marginBottom: 6 }}>{product.vendor_name || 'Vendeur SAFi'}</div>
+            <div style={{ fontSize: 13.5, fontWeight: 600, marginBottom: 6 }}>{product.name}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <button onClick={() => updateQuantity(product.id, quantity - 1)} style={{ width: 24, height: 24, borderRadius: 6, border: '1px solid var(--line)', background: 'var(--card)', fontSize: 12 }}>−</button>
               <span style={{ fontFamily: 'JetBrains Mono', fontSize: 12.5 }}>{quantity} {product.unit}</span>

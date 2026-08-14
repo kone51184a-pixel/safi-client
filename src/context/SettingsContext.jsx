@@ -2,23 +2,38 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { api } from '../api/client';
 
-const SettingsContext = createContext({ deliveryFee: 1000 });
+const SettingsContext = createContext({
+  deliveryFee: 1000,
+  tvaRate: 18,
+  orangeMoneyNumber: '',
+  waveNumber: '',
+});
 
 export function SettingsProvider({ children }) {
   const { token } = useAuth();
-  const [deliveryFee, setDeliveryFee] = useState(1000);
+  const [settings, setSettings] = useState({
+    deliveryFee: 1000,
+    tvaRate: 18,
+    orangeMoneyNumber: '',
+    waveNumber: '',
+  });
 
   useEffect(() => {
     if (!token) return;
     api.getSettings(token)
-      .then((settings) => {
-        if (settings.delivery_fee) setDeliveryFee(Number(settings.delivery_fee));
+      .then((data) => {
+        setSettings({
+          deliveryFee: data.delivery_fee ? Number(data.delivery_fee) : 1000,
+          tvaRate: data.tva_rate ? Number(data.tva_rate) : 18,
+          orangeMoneyNumber: data.orange_money_number || '',
+          waveNumber: data.wave_number || '',
+        });
       })
-      .catch(() => {}); // on garde la valeur par défaut si ça échoue
+      .catch(() => {});
   }, [token]);
 
   return (
-    <SettingsContext.Provider value={{ deliveryFee }}>
+    <SettingsContext.Provider value={settings}>
       {children}
     </SettingsContext.Provider>
   );

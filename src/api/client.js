@@ -31,6 +31,15 @@ export const api = {
   createOrder: (token, order) => request('/orders', { method: 'POST', body: order, token }),
   getOrders: (token) => request('/orders', { token }),
   getOrder: (token, id) => request(`/orders/${id}`, { token }),
+  cancelOrder: (token, id) => request(`/orders/${id}/cancel`, { method: 'PATCH', token }),
 
   getSettings: (token) => request('/settings', { token }),
+
+  createReview: (token, review) => request('/reviews', { method: 'POST', body: review, token }),
+  getReviewForOrder: (token, orderId) => request(`/reviews/order/${orderId}`, { token }),
+
+  // Vue publique livreur — pas de token, accès via lien SMS
+  getDelivererView: (orderId) => request(`/orders/${orderId}/deliverer-view`, { token: null }),
+  respondAsDeliverer: (orderId, action) =>
+    request(`/orders/${orderId}/deliverer-response`, { method: 'POST', body: { action } }),
 };

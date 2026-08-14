@@ -45,6 +45,13 @@ export default function Home() {
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '30px 24px' }}>
+      <p style={{
+        fontFamily: 'Space Grotesk', fontSize: 15, fontWeight: 600, color: 'var(--leaf-deep)',
+        fontStyle: 'italic', marginBottom: 20, textAlign: 'center'
+      }}>
+        « Approvisionner pour impacter la vie des gens »
+      </p>
+
       <Link to="/demande-libre" style={{ display: 'block', marginBottom: 28 }}>
         <div style={{
           borderRadius: 18, padding: 28, background: 'linear-gradient(120deg, var(--leaf-deep), var(--leaf))',
@@ -96,8 +103,7 @@ export function ProductCard({ product }) {
         ) : '🍅'}
       </div>
       <div style={{ padding: '10px 12px 14px' }}>
-        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 2 }}>{product.name}</div>
-        <div style={{ fontSize: 10.5, color: 'var(--ink-soft)', marginBottom: 6 }}>{product.vendor_name || 'Vendeur SAFi'}</div>
+        <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{product.name}</div>
         <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--tomato)', fontWeight: 600 }}>
           {Number(product.price).toLocaleString()} F/{product.unit}
         </div>

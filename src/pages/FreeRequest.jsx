@@ -22,6 +22,7 @@ export default function FreeRequest() {
         free_request_description: form.description,
         free_request_budget: form.budget ? Number(form.budget) : null,
         wants_bio: wantsBio,
+        delivery_address: form.address,
       });
       navigate('/confirmation', { state: { orderNumber: order.order_number, orderId: order.id } });
     } catch (err) {
@@ -59,7 +60,7 @@ export default function FreeRequest() {
           <input style={inputStyle} required value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} placeholder="Ex : Restaurant Teriya, Hamdallaye" />
         </Field>
 
-        <div style={{ fontSize: 13, fontWeight: 700, margin: '4px 0 10px' }}>Produit bio ?</div>
+        <div style={{ fontSize: 13, fontWeight: 700, margin: '4px 0 10px' }}>Produit bio</div>
         <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
           <button
             type="button"
