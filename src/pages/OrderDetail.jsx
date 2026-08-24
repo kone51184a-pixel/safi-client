@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 import { StatusPill, Timeline, Button } from '../components/UI';
+import PaymentPanel from '../components/PaymentPanel';
 
 const CANCELLABLE = ['pending', 'awaiting_matching', 'confirmed', 'picked_up'];
 
@@ -18,6 +19,7 @@ export default function OrderDetail() {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('wave');
 
   async function load() {
     setLoading(true);
@@ -114,17 +116,36 @@ export default function OrderDetail() {
       {order.free_request_description && (
         <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 12, padding: 14, marginBottom: 24, fontSize: 13 }}>
           <div style={{ fontWeight: 600, marginBottom: 4 }}>Votre demande :</div>
-          <div style={{ color: 'var(--ink-soft)' }}>{order.free_request_description}</div>
+          <div style={{ color: 'var(--ink-soft)' }}>
+            {order.free_request_description}
+            {order.free_request_quantity_kg && <span style={{ fontFamily: 'JetBrains Mono' }}> ({order.free_request_quantity_kg} kg)</span>}
+          </div>
           {order.total && Number(order.total) > 0 ? (
-            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--line)', display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ fontWeight: 600 }}>Prix proposé</span>
-              <span className="mono" style={{ fontWeight: 700, color: 'var(--tomato)' }}>{Number(order.total).toLocaleString()} F</span>
+            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--line)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 12.5, color: 'var(--ink-soft)' }}>
+                <span>Prix des produits</span><span className="mono">{Number(order.subtotal).toLocaleString()} F</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 12.5, color: 'var(--ink-soft)' }}>
+                <span>Frais de livraison</span><span className="mono">{Number(order.delivery_fee).toLocaleString()} F</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 12.5, color: 'var(--ink-soft)' }}>
+                <span>TVA</span><span className="mono">{Number(order.tva_amount || 0).toLocaleString()} F</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '1px dashed var(--line)', fontWeight: 700 }}>
+                <span>Total</span><span className="mono" style={{ color: 'var(--tomato)' }}>{Number(order.total).toLocaleString()} F</span>
+              </div>
             </div>
           ) : (
             <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--line)', fontSize: 11.5, color: 'var(--ink-soft)' }}>
               💬 Prix en cours de confirmation par notre équipe
             </div>
           )}
+        </div>
+      )}
+
+      {order.order_type === 'free_request' && Number(order.total) > 0 && !['delivered', 'cancelled'].includes(order.status) && (
+        <div style={{ marginBottom: 24 }}>
+          <PaymentPanel amount={Number(order.total)} method={paymentMethod} setMethod={setPaymentMethod} />
         </div>
       )}
 

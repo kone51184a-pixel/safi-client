@@ -9,6 +9,7 @@ const TABS = [
   { key: 'all', label: 'Tous' },
   { key: 'Fruits', label: '🥭 Fruits' },
   { key: 'Légumes', label: '🍅 Légumes' },
+  { key: 'Bio', label: '🌱 Bio' },
 ];
 
 export default function Catalog() {
@@ -47,7 +48,11 @@ export default function Catalog() {
 
   // Le catalogue ne vend pour l'instant que fruits et légumes
   const produce = products.filter((p) => p.category_name === 'Fruits' || p.category_name === 'Légumes');
-  const filtered = tab === 'all' ? produce : produce.filter((p) => p.category_name === tab);
+  const filtered = tab === 'all'
+    ? produce
+    : tab === 'Bio'
+      ? produce.filter((p) => p.price_bio)
+      : produce.filter((p) => p.category_name === tab);
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '30px 24px' }}>

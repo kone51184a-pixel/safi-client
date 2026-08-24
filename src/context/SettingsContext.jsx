@@ -2,21 +2,19 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useAuth } from './AuthContext';
 import { api } from '../api/client';
 
-const SettingsContext = createContext({
+const defaults = {
   deliveryFee: 1000,
   tvaRate: 18,
   orangeMoneyNumber: '',
   waveNumber: '',
-});
+  moovMoneyNumber: '',
+};
+
+const SettingsContext = createContext(defaults);
 
 export function SettingsProvider({ children }) {
   const { token } = useAuth();
-  const [settings, setSettings] = useState({
-    deliveryFee: 1000,
-    tvaRate: 18,
-    orangeMoneyNumber: '',
-    waveNumber: '',
-  });
+  const [settings, setSettings] = useState(defaults);
 
   useEffect(() => {
     if (!token) return;
@@ -27,6 +25,7 @@ export function SettingsProvider({ children }) {
           tvaRate: data.tva_rate ? Number(data.tva_rate) : 18,
           orangeMoneyNumber: data.orange_money_number || '',
           waveNumber: data.wave_number || '',
+          moovMoneyNumber: data.moov_money_number || '',
         });
       })
       .catch(() => {});
