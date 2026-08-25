@@ -46,12 +46,15 @@ export default function Catalog() {
     setSearchParams(searchParams);
   }
 
-  // Le catalogue ne vend pour l'instant que fruits et légumes
-  const produce = products.filter((p) => p.category_name === 'Fruits' || p.category_name === 'Légumes');
+  // Le catalogue vend fruits, légumes, et les produits classés Bio
+  const produce = products.filter((p) =>
+    ['Fruits', 'Légumes', 'Bio'].includes(p.category_name)
+  );
   const filtered = tab === 'all'
     ? produce
     : tab === 'Bio'
-      ? produce.filter((p) => p.price_bio)
+      // Bio = catégorie "Bio" directe, OU produit Fruits/Légumes avec un prix bio renseigné
+      ? produce.filter((p) => p.category_name === 'Bio' || p.price_bio)
       : produce.filter((p) => p.category_name === tab);
 
   return (
