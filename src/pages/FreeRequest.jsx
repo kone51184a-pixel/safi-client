@@ -21,6 +21,8 @@ export default function FreeRequest() {
   const [address, setAddress] = useState('');
   const [wantsBio, setWantsBio] = useState(null);
   const [method, setMethod] = useState('wave');
+  const [paymentReference, setPaymentReference] = useState('');
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -37,6 +39,12 @@ export default function FreeRequest() {
   const tvaAmount = Math.round(subtotal * (tvaRate / 100));
   const total = subtotal + deliveryFee + tvaAmount;
   const reachedMin = totalKg >= MIN_KG;
+
+  // Paiement à la livraison : rien à vérifier avant de commander.
+  // Toute autre méthode : référence de transaction (6 caractères min.) + case cochée obligatoires.
+  const requiresProof = method !== 'cash_on_delivery';
+  const paymentReady = !requiresProof || (paymentReference.trim().length >= 6 && paymentConfirmed);
+  const canSubmit = reachedMin && items.length > 0 && address.trim() !== '' && paymentReady && !loading;
 
   function addItem() {
     if (!selectedProductId || !addQuantity || Number(addQuantity) <= 0) return;
@@ -58,7 +66,12 @@ export default function FreeRequest() {
   }
 
   async function handleSubmit() {
-    if (!reachedMin || items.length === 0 || !address.trim()) return;
+    if (!canSubmit) {
+      if (!paymentReady) {
+        setError('Merci de renseigner la référence de ta transaction et de confirmer le paiement avant de commander.');
+      }
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -69,6 +82,8 @@ export default function FreeRequest() {
         delivery_fee: deliveryFee,
         wants_bio: wantsBio,
         delivery_address: address,
+        payment_method: method,
+        payment_reference: requiresProof ? paymentReference.trim() : null,
       });
       navigate('/confirmation', { state: { orderNumber: order.order_number, orderId: order.id } });
     } catch (err) {
@@ -189,7 +204,15 @@ export default function FreeRequest() {
       )}
 
       {reachedMin && items.length > 0 && (
-        <PaymentPanel amount={total} method={method} setMethod={setMethod} />
+        <PaymentPanel
+          amount={total}
+          method={method}
+          setMethod={setMethod}
+          paymentReference={paymentReference}
+          setPaymentReference={setPaymentReference}
+          paymentConfirmed={paymentConfirmed}
+          setPaymentConfirmed={setPaymentConfirmed}
+        />
       )}
 
       {error && <p style={{ color: 'var(--tomato)', fontSize: 12, marginBottom: 12 }}>{error}</p>}
@@ -198,10 +221,15 @@ export default function FreeRequest() {
         variant="leaf"
         style={{ width: '100%' }}
         onClick={handleSubmit}
-        disabled={loading || !reachedMin || items.length === 0 || !address.trim()}
+        disabled={!canSubmit}
       >
         {loading ? 'Envoi…' : 'Confirmer la commande'}
       </Button>
+      {reachedMin && items.length > 0 && requiresProof && !paymentReady && (
+        <p style={{ fontSize: 11, color: 'var(--tomato)', textAlign: 'center', marginTop: 8 }}>
+          Renseigne la référence de paiement et coche la case pour pouvoir commander.
+        </p>
+      )}
     </div>
   );
 }
