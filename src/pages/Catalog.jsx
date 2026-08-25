@@ -91,7 +91,7 @@ export default function Catalog() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: 16 }}>
           {filtered.map((p) => (
-            <ProductCard key={p.id} product={p} />
+            <ProductCard key={p.id} product={p} bioContext={tab === 'Bio'} />
           ))}
         </div>
       )}

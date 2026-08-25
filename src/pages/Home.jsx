@@ -102,7 +102,13 @@ export default function Home() {
   );
 }
 
-export function ProductCard({ product }) {
+export function ProductCard({ product, bioContext }) {
+  // Si on affiche cette carte dans un contexte Bio et que ce produit a un prix bio distinct
+  // (produit Fruits/Légumes avec price_bio renseigné), on montre ce prix-là, bien identifié —
+  // sinon (produit classé directement en catégorie "Bio", ou contexte normal) on garde le prix standard.
+  const showBioPrice = bioContext && product.price_bio;
+  const displayPrice = showBioPrice ? product.price_bio : product.price;
+
   return (
     <Link to={`/produit/${product.id}`} style={{
       background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden'
@@ -114,9 +120,20 @@ export function ProductCard({ product }) {
       </div>
       <div style={{ padding: '10px 12px 14px' }}>
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{product.name}</div>
-        <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--tomato)', fontWeight: 600 }}>
-          {Number(product.price).toLocaleString()} F/{product.unit}
-        </div>
+        {showBioPrice ? (
+          <div>
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--leaf-deep)', fontWeight: 700 }}>
+              🌱 {Number(product.price_bio).toLocaleString()} F/{product.unit}
+            </div>
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--ink-soft)', textDecoration: 'line-through' }}>
+              {Number(product.price).toLocaleString()} F non bio
+            </div>
+          </div>
+        ) : (
+          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--tomato)', fontWeight: 600 }}>
+            {Number(displayPrice).toLocaleString()} F/{product.unit}
+          </div>
+        )}
       </div>
     </Link>
   );
