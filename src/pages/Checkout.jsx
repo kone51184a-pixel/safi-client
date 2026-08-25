@@ -15,13 +15,26 @@ export default function Checkout() {
   const [address, setAddress] = useState('');
   const [method, setMethod] = useState('wave');
   const [wantsBio, setWantsBio] = useState(null);
+  const [paymentReference, setPaymentReference] = useState('');
+  const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const tvaAmount = Math.round(subtotal * (tvaRate / 100));
   const total = subtotal + deliveryFee + tvaAmount;
 
+  // Paiement à la livraison : rien à vérifier avant de commander.
+  // Toute autre méthode : le client doit avoir renseigné une référence de transaction
+  // ET coché la case de confirmation avant de pouvoir valider sa commande.
+  const requiresProof = method !== 'cash_on_delivery';
+  const paymentReady = !requiresProof || (paymentReference.trim() !== '' && paymentConfirmed);
+  const canSubmit = address.trim() !== '' && paymentReady && !loading;
+
   async function handleConfirm() {
+    if (!paymentReady) {
+      setError('Merci de renseigner la référence de ta transaction et de confirmer le paiement avant de commander.');
+      return;
+    }
     setLoading(true);
     setError('');
     try {
@@ -31,6 +44,8 @@ export default function Checkout() {
         delivery_fee: deliveryFee,
         wants_bio: wantsBio,
         delivery_address: address,
+        payment_method: method,
+        payment_reference: requiresProof ? paymentReference.trim() : null,
       });
       clearCart();
       navigate('/confirmation', { state: { orderNumber: order.order_number, orderId: order.id } });
@@ -97,13 +112,26 @@ export default function Checkout() {
         </button>
       </div>
 
-      <PaymentPanel amount={total} method={method} setMethod={setMethod} />
+      <PaymentPanel
+        amount={total}
+        method={method}
+        setMethod={setMethod}
+        paymentReference={paymentReference}
+        setPaymentReference={setPaymentReference}
+        paymentConfirmed={paymentConfirmed}
+        setPaymentConfirmed={setPaymentConfirmed}
+      />
 
       {error && <p style={{ color: 'var(--tomato)', fontSize: 12, marginBottom: 12 }}>{error}</p>}
 
-      <Button style={{ width: '100%' }} onClick={handleConfirm} disabled={loading || !address.trim()}>
+      <Button style={{ width: '100%' }} onClick={handleConfirm} disabled={!canSubmit}>
         {loading ? 'Confirmation…' : 'Confirmer la commande'}
       </Button>
+      {requiresProof && !paymentReady && (
+        <p style={{ fontSize: 11, color: 'var(--tomato)', textAlign: 'center', marginTop: 8 }}>
+          Renseigne la référence de paiement et coche la case pour pouvoir commander.
+        </p>
+      )}
       <p style={{ fontSize: 11, color: 'var(--ink-soft)', textAlign: 'center', marginTop: 10 }}>
         Tu pourras annuler ta commande depuis son suivi tant qu'elle n'est pas en livraison.
       </p>
