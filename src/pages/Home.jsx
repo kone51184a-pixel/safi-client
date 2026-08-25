@@ -8,6 +8,8 @@ const FRESH_CATEGORIES = [
   { name: 'Fruits', icon: '🥭', color: 'var(--leaf)', image: 'https://images.pexels.com/photos/3978830/pexels-photo-3978830.jpeg?auto=compress&cs=tinysrgb&w=200' },
 ];
 
+const BIO_CATEGORY = { name: 'Bio', icon: '🌱', color: 'var(--leaf-deep)', image: 'https://images.pexels.com/photos/1656663/pexels-photo-1656663.jpeg?auto=compress&cs=tinysrgb&w=200' };
+
 function CategoryTile({ c }) {
   return (
     <Link to={`/catalogue?categorie=${encodeURIComponent(c.name)}`} style={{ textAlign: 'center' }}>
@@ -66,23 +68,17 @@ export default function Home() {
         <span style={{ fontSize: 15 }}>🌱</span>
         <h3 style={{ fontSize: 15, color: 'var(--leaf-deep)', fontFamily: 'JetBrains Mono', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Fruits & légumes</h3>
       </div>
-      <div style={{ display: 'flex', gap: 16, marginBottom: 20, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 30, flexWrap: 'wrap' }}>
         {FRESH_CATEGORIES.map((c) => <CategoryTile key={c.name} c={c} />)}
       </div>
 
-      <Link to="/catalogue?categorie=Bio" style={{ display: 'block', marginBottom: 34 }}>
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 14, padding: '14px 18px',
-          background: 'linear-gradient(120deg, rgba(63,122,84,0.08), rgba(217,164,65,0.1))',
-          border: '1.5px solid var(--leaf)', borderRadius: 14,
-        }}>
-          <div style={{ fontSize: 26 }}>🌱</div>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--leaf-deep)' }}>Bio</div>
-            <div style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>Nos produits certifiés bio, à part</div>
-          </div>
-        </div>
-      </Link>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
+        <span style={{ fontSize: 15 }}>🌱</span>
+        <h3 style={{ fontSize: 15, color: 'var(--leaf-deep)', fontFamily: 'JetBrains Mono', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bio</h3>
+      </div>
+      <div style={{ display: 'flex', gap: 16, marginBottom: 34, flexWrap: 'wrap' }}>
+        <CategoryTile c={BIO_CATEGORY} />
+      </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <h3 style={{ fontSize: 15, color: 'var(--ink-soft)', fontFamily: 'JetBrains Mono', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Disponible aujourd'hui</h3>
