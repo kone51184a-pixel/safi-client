@@ -96,13 +96,13 @@ export default function OrderDetail() {
         </div>
       )}
 
-      {order.order_type === 'catalog' && Number(order.total) > 0 && (
+      {Number(order.total) > 0 && (
         <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 12, padding: 14, marginBottom: 24, fontSize: 12.5 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, color: 'var(--ink-soft)' }}>
-            <span>Sous-total</span><span className="mono">{Number(order.subtotal).toLocaleString()} F</span>
+            <span>Prix des produits</span><span className="mono">{Number(order.subtotal).toLocaleString()} F</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, color: 'var(--ink-soft)' }}>
-            <span>Livraison</span><span className="mono">{Number(order.delivery_fee).toLocaleString()} F</span>
+            <span>Frais de livraison</span><span className="mono">{Number(order.delivery_fee).toLocaleString()} F</span>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, color: 'var(--ink-soft)' }}>
             <span>TVA</span><span className="mono">{Number(order.tva_amount || 0).toLocaleString()} F</span>
@@ -115,31 +115,8 @@ export default function OrderDetail() {
 
       {order.free_request_description && (
         <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 12, padding: 14, marginBottom: 24, fontSize: 13 }}>
-          <div style={{ fontWeight: 600, marginBottom: 4 }}>Votre demande :</div>
-          <div style={{ color: 'var(--ink-soft)' }}>
-            {order.free_request_description}
-            {order.free_request_quantity_kg && <span style={{ fontFamily: 'JetBrains Mono' }}> ({order.free_request_quantity_kg} kg)</span>}
-          </div>
-          {order.total && Number(order.total) > 0 ? (
-            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--line)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 12.5, color: 'var(--ink-soft)' }}>
-                <span>Prix des produits</span><span className="mono">{Number(order.subtotal).toLocaleString()} F</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 12.5, color: 'var(--ink-soft)' }}>
-                <span>Frais de livraison</span><span className="mono">{Number(order.delivery_fee).toLocaleString()} F</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 12.5, color: 'var(--ink-soft)' }}>
-                <span>TVA</span><span className="mono">{Number(order.tva_amount || 0).toLocaleString()} F</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '1px dashed var(--line)', fontWeight: 700 }}>
-                <span>Total</span><span className="mono" style={{ color: 'var(--tomato)' }}>{Number(order.total).toLocaleString()} F</span>
-              </div>
-            </div>
-          ) : (
-            <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--line)', fontSize: 11.5, color: 'var(--ink-soft)' }}>
-              💬 Prix en cours de confirmation par notre équipe
-            </div>
-          )}
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>Notes :</div>
+          <div style={{ color: 'var(--ink-soft)' }}>{order.free_request_description}</div>
         </div>
       )}
 
