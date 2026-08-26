@@ -32,14 +32,14 @@ export default function Register() {
       }}>
         <div style={{ textAlign: 'center', marginBottom: 22 }}>
           <h2 style={{ fontSize: 19 }}>Créer un compte</h2>
-          <p style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 4 }}>Restaurant ou fast-food ou Particulier</p>
+          <p style={{ fontSize: 12, color: 'var(--ink-soft)', marginTop: 4 }}>Restaurant ou fast-food ou particulier</p>
         </div>
 
         <Field label="Vous êtes">
           <select style={inputStyle} value={form.client_type} onChange={(e) => setForm({ ...form, client_type: e.target.value })}>
             <option value="restaurant">Restaurant</option>
             <option value="fast_food">Fast-food</option>
-            <option value="Particulier">Particulier</option>
+            <option value="particulier">particulier</option>
           </select>
         </Field>
         <Field label="Nom complet / Nom du restaurant">
