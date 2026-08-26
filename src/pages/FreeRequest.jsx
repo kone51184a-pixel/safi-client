@@ -14,12 +14,12 @@ export default function FreeRequest() {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
-  const [items, setItems] = useState([]); // [{ product, quantity }]
+  const [items, setItems] = useState([]); // [{ product, quantity, isBio }]
   const [selectedProductId, setSelectedProductId] = useState('');
   const [addQuantity, setAddQuantity] = useState('');
+  const [addIsBio, setAddIsBio] = useState(false);
   const [notes, setNotes] = useState('');
   const [address, setAddress] = useState('');
-  const [wantsBio, setWantsBio] = useState(null);
   const [method, setMethod] = useState('wave');
   const [paymentReference, setPaymentReference] = useState('');
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
@@ -31,14 +31,18 @@ export default function FreeRequest() {
     api.getProducts(token).then(setProducts).catch(() => {});
   }, [token]);
 
+  function itemPrice(i) {
+    return (i.isBio && i.product.price_bio) ? Number(i.product.price_bio) : Number(i.product.price);
+  }
+
   const totalKg = items.reduce((sum, i) => sum + i.quantity, 0);
-  const subtotal = items.reduce((sum, i) => {
-    const price = (wantsBio && i.product.price_bio) ? Number(i.product.price_bio) : Number(i.product.price);
-    return sum + price * i.quantity;
-  }, 0);
+  const subtotal = items.reduce((sum, i) => sum + itemPrice(i) * i.quantity, 0);
   const tvaAmount = Math.round(subtotal * (tvaRate / 100));
   const total = subtotal + deliveryFee + tvaAmount;
   const reachedMin = totalKg >= MIN_KG;
+
+  const selectedProduct = products.find((p) => p.id === selectedProductId);
+  const canAddBio = Boolean(selectedProduct?.price_bio);
 
   // Paiement à la livraison : rien à vérifier avant de commander.
   // Toute autre méthode : référence de transaction (6 caractères min.) + case cochée obligatoires.
@@ -50,19 +54,21 @@ export default function FreeRequest() {
     if (!selectedProductId || !addQuantity || Number(addQuantity) <= 0) return;
     const product = products.find((p) => p.id === selectedProductId);
     if (!product) return;
+    const isBio = canAddBio ? addIsBio : false;
     setItems((prev) => {
-      const existing = prev.find((i) => i.product.id === product.id);
+      const existing = prev.find((i) => i.product.id === product.id && i.isBio === isBio);
       if (existing) {
-        return prev.map((i) => (i.product.id === product.id ? { ...i, quantity: i.quantity + Number(addQuantity) } : i));
+        return prev.map((i) => (i === existing ? { ...i, quantity: i.quantity + Number(addQuantity) } : i));
       }
-      return [...prev, { product, quantity: Number(addQuantity) }];
+      return [...prev, { product, quantity: Number(addQuantity), isBio }];
     });
     setSelectedProductId('');
     setAddQuantity('');
+    setAddIsBio(false);
   }
 
-  function removeItem(productId) {
-    setItems((prev) => prev.filter((i) => i.product.id !== productId));
+  function removeItem(productId, isBio) {
+    setItems((prev) => prev.filter((i) => !(i.product.id === productId && i.isBio === isBio)));
   }
 
   async function handleSubmit() {
@@ -77,10 +83,9 @@ export default function FreeRequest() {
     try {
       const order = await api.createOrder(token, {
         order_type: 'free_request',
-        items: items.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
+        items: items.map((i) => ({ product_id: i.product.id, quantity: i.quantity, is_bio: i.isBio })),
         free_request_description: notes,
         delivery_fee: deliveryFee,
-        wants_bio: wantsBio,
         delivery_address: address,
         payment_method: method,
         payment_reference: requiresProof ? paymentReference.trim() : null,
@@ -105,8 +110,8 @@ export default function FreeRequest() {
       </p>
 
       <Field label="Ajouter un produit">
-        <div style={{ display: 'flex', gap: 8 }}>
-          <select style={{ ...inputStyle, flex: 1 }} value={selectedProductId} onChange={(e) => setSelectedProductId(e.target.value)}>
+        <div style={{ display: 'flex', gap: 8, marginBottom: canAddBio ? 8 : 0 }}>
+          <select style={{ ...inputStyle, flex: 1 }} value={selectedProductId} onChange={(e) => { setSelectedProductId(e.target.value); setAddIsBio(false); }}>
             <option value="">— Choisir —</option>
             {products.map((p) => (
               <option key={p.id} value={p.id}>{p.name} ({Number(p.price).toLocaleString()} F/{p.unit})</option>
@@ -121,21 +126,34 @@ export default function FreeRequest() {
           />
           <button type="button" onClick={addItem} style={{ background: 'var(--leaf)', color: 'white', border: 'none', borderRadius: 10, padding: '0 16px', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>+</button>
         </div>
+        {canAddBio && (
+          <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+            <input type="checkbox" checked={addIsBio} onChange={(e) => setAddIsBio(e.target.checked)} />
+            <span style={{ fontSize: 12, color: 'var(--leaf-deep)', fontWeight: 600 }}>
+              🌱 Version bio ({Number(selectedProduct.price_bio).toLocaleString()} F/{selectedProduct.unit})
+            </span>
+          </label>
+        )}
       </Field>
 
       {items.length > 0 && (
         <div style={{ marginBottom: 18 }}>
           {items.map((i) => (
-            <div key={i.product.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--line)' }}>
+            <div key={`${i.product.id}:${i.isBio ? 'bio' : 'std'}`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid var(--line)' }}>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600 }}>{i.product.name}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {i.product.name}
+                  {i.isBio && (
+                    <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--leaf-deep)', background: 'rgba(63,122,84,0.1)', padding: '1px 6px', borderRadius: 20 }}>🌱 Bio</span>
+                  )}
+                </div>
                 <div style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>{i.quantity} {i.product.unit}</div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span className="mono" style={{ fontSize: 13 }}>
-                  {(((wantsBio && i.product.price_bio) ? Number(i.product.price_bio) : Number(i.product.price)) * i.quantity).toLocaleString()} F
+                  {(itemPrice(i) * i.quantity).toLocaleString()} F
                 </span>
-                <button type="button" onClick={() => removeItem(i.product.id)} style={{ background: 'none', border: 'none', color: 'var(--tomato)', fontSize: 11, cursor: 'pointer' }}>Retirer</button>
+                <button type="button" onClick={() => removeItem(i.product.id, i.isBio)} style={{ background: 'none', border: 'none', color: 'var(--tomato)', fontSize: 11, cursor: 'pointer' }}>Retirer</button>
               </div>
             </div>
           ))}
@@ -157,34 +175,6 @@ export default function FreeRequest() {
       <Field label="Adresse de livraison">
         <input style={inputStyle} required value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Ex : Restaurant Teriya, Hamdallaye" />
       </Field>
-
-      <div style={{ fontSize: 13, fontWeight: 700, margin: '4px 0 10px' }}>Produit bio</div>
-      <div style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
-        <button
-          type="button"
-          onClick={() => setWantsBio(true)}
-          style={{
-            flex: 1, padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            border: `1.5px solid ${wantsBio === true ? 'var(--leaf)' : 'var(--line)'}`,
-            background: wantsBio === true ? 'rgba(63,122,84,0.08)' : 'var(--card)',
-            color: wantsBio === true ? 'var(--leaf-deep)' : 'var(--ink)',
-          }}
-        >
-          🌱 Oui
-        </button>
-        <button
-          type="button"
-          onClick={() => setWantsBio(false)}
-          style={{
-            flex: 1, padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            border: `1.5px solid ${wantsBio === false ? 'var(--indigo)' : 'var(--line)'}`,
-            background: wantsBio === false ? 'rgba(28,37,65,0.05)' : 'var(--card)',
-            color: 'var(--ink)',
-          }}
-        >
-          Non
-        </button>
-      </div>
 
       {items.length > 0 && (
         <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 14, padding: 16, marginBottom: 18 }}>

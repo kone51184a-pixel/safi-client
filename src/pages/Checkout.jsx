@@ -14,7 +14,6 @@ export default function Checkout() {
   const navigate = useNavigate();
   const [address, setAddress] = useState('');
   const [method, setMethod] = useState('wave');
-  const [wantsBio, setWantsBio] = useState(null);
   const [paymentReference, setPaymentReference] = useState('');
   const [paymentConfirmed, setPaymentConfirmed] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -25,9 +24,9 @@ export default function Checkout() {
 
   // Paiement à la livraison : rien à vérifier avant de commander.
   // Toute autre méthode : le client doit avoir renseigné une référence de transaction
-  // ET coché la case de confirmation avant de pouvoir valider sa commande.
+  // d'au moins 6 caractères ET coché la case de confirmation avant de pouvoir valider sa commande.
   const requiresProof = method !== 'cash_on_delivery';
-  const paymentReady = !requiresProof || (paymentReference.trim() !== '' && paymentConfirmed);
+  const paymentReady = !requiresProof || (paymentReference.trim().length >= 6 && paymentConfirmed);
   const canSubmit = address.trim() !== '' && paymentReady && !loading;
 
   async function handleConfirm() {
@@ -40,9 +39,10 @@ export default function Checkout() {
     try {
       const order = await api.createOrder(token, {
         order_type: 'catalog',
-        items: items.map((i) => ({ product_id: i.product.id, quantity: i.quantity })),
+        // Chaque article porte déjà son propre statut bio (choisi sur la fiche produit) —
+        // plus besoin d'un choix global pour toute la commande.
+        items: items.map((i) => ({ product_id: i.product.id, quantity: i.quantity, is_bio: i.isBio })),
         delivery_fee: deliveryFee,
-        wants_bio: wantsBio,
         delivery_address: address,
         payment_method: method,
         payment_reference: requiresProof ? paymentReference.trim() : null,
@@ -82,34 +82,6 @@ export default function Checkout() {
         <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 8, borderTop: '1px dashed var(--line)', fontWeight: 700, fontSize: 14 }}>
           <span>Total</span><span className="mono">{total.toLocaleString()} F</span>
         </div>
-      </div>
-
-      <div style={{ fontSize: 13, fontWeight: 700, margin: '18px 0 10px' }}>Produit bio</div>
-      <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
-        <button
-          type="button"
-          onClick={() => setWantsBio(true)}
-          style={{
-            flex: 1, padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            border: `1.5px solid ${wantsBio === true ? 'var(--leaf)' : 'var(--line)'}`,
-            background: wantsBio === true ? 'rgba(63,122,84,0.08)' : 'var(--card)',
-            color: wantsBio === true ? 'var(--leaf-deep)' : 'var(--ink)',
-          }}
-        >
-          🌱 Oui
-        </button>
-        <button
-          type="button"
-          onClick={() => setWantsBio(false)}
-          style={{
-            flex: 1, padding: '11px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
-            border: `1.5px solid ${wantsBio === false ? 'var(--indigo)' : 'var(--line)'}`,
-            background: wantsBio === false ? 'rgba(28,37,65,0.05)' : 'var(--card)',
-            color: 'var(--ink)',
-          }}
-        >
-          Non
-        </button>
       </div>
 
       <PaymentPanel

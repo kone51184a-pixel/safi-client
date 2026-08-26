@@ -12,6 +12,7 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [isBio, setIsBio] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,8 +23,13 @@ export default function ProductDetail() {
   if (loading) return <p style={{ padding: 30, fontSize: 13, color: 'var(--ink-soft)' }}>Chargement…</p>;
   if (!product) return <p style={{ padding: 30, fontSize: 13, color: 'var(--ink-soft)' }}>Produit introuvable.</p>;
 
+  const hasBioOption = Boolean(product.price_bio);
+  // Produit classé directement dans la catégorie "Bio" : son prix normal EST déjà le prix bio,
+  // pas besoin de choix supplémentaire.
+  const isDirectlyBioCategory = product.category_name === 'Bio';
+
   function handleAddToCart() {
-    addItem(product, quantity);
+    addItem(product, quantity, isDirectlyBioCategory ? false : isBio);
     navigate('/panier');
   }
 
@@ -38,16 +44,56 @@ export default function ProductDetail() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
         <div>
           <h2 style={{ fontSize: 22 }}>{product.name}</h2>
-          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 16, color: 'var(--tomato)', fontWeight: 600, marginTop: 4 }}>
-            {Number(product.price).toLocaleString()} F / {product.unit}
-          </div>
-          {product.price_bio && (
-            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--leaf)', fontWeight: 600, marginTop: 2 }}>
-              🌱 Bio : {Number(product.price_bio).toLocaleString()} F / {product.unit}
+          {isDirectlyBioCategory ? (
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 16, color: 'var(--leaf-deep)', fontWeight: 600, marginTop: 4 }}>
+              🌱 {Number(product.price).toLocaleString()} F / {product.unit}
             </div>
+          ) : (
+            <>
+              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 16, color: 'var(--tomato)', fontWeight: 600, marginTop: 4 }}>
+                {Number(product.price).toLocaleString()} F / {product.unit}
+              </div>
+              {hasBioOption && (
+                <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--leaf)', fontWeight: 600, marginTop: 2 }}>
+                  🌱 Bio : {Number(product.price_bio).toLocaleString()} F / {product.unit}
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
+
+      {!isDirectlyBioCategory && hasBioOption && (
+        <div style={{ marginBottom: 22 }}>
+          <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', marginBottom: 8 }}>Version :</div>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              type="button"
+              onClick={() => setIsBio(false)}
+              style={{
+                flex: 1, padding: '10px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                border: `1.5px solid ${!isBio ? 'var(--tomato)' : 'var(--line)'}`,
+                background: !isBio ? 'rgba(198,71,63,0.06)' : 'var(--card)',
+                color: 'var(--ink)',
+              }}
+            >
+              Normal — {Number(product.price).toLocaleString()} F
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsBio(true)}
+              style={{
+                flex: 1, padding: '10px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer',
+                border: `1.5px solid ${isBio ? 'var(--leaf)' : 'var(--line)'}`,
+                background: isBio ? 'rgba(63,122,84,0.08)' : 'var(--card)',
+                color: isBio ? 'var(--leaf-deep)' : 'var(--ink)',
+              }}
+            >
+              🌱 Bio — {Number(product.price_bio).toLocaleString()} F
+            </button>
+          </div>
+        </div>
+      )}
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
         <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)' }}>Quantité :</span>

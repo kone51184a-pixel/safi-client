@@ -4,7 +4,7 @@ import { useSettings } from '../context/SettingsContext';
 import { Button } from '../components/UI';
 
 export default function Cart() {
-  const { items, updateQuantity, removeItem, subtotal } = useCart();
+  const { items, updateQuantity, removeItem, subtotal, unitPrice } = useCart();
   const { deliveryFee } = useSettings();
   const navigate = useNavigate();
 
@@ -25,24 +25,33 @@ export default function Cart() {
     <div style={{ maxWidth: 600, margin: '0 auto', padding: '30px 24px' }}>
       <h2 style={{ fontSize: 20, marginBottom: 20 }}>Mon panier ({items.length})</h2>
 
-      {items.map(({ product, quantity }) => (
-        <div key={product.id} style={{ display: 'flex', gap: 14, padding: '16px 0', borderBottom: '1px solid var(--line)', alignItems: 'center' }}>
+      {items.map(({ product, quantity, isBio }) => (
+        <div key={`${product.id}:${isBio ? 'bio' : 'std'}`} style={{ display: 'flex', gap: 14, padding: '16px 0', borderBottom: '1px solid var(--line)', alignItems: 'center' }}>
           <div style={{ width: 56, height: 56, borderRadius: 12, background: 'var(--sand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, flexShrink: 0, overflow: 'hidden' }}>
             {product.photo_url ? (
               <img src={product.photo_url} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : '🍅'}
           </div>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 13.5, fontWeight: 600, marginBottom: 6 }}>{product.name}</div>
+            <div style={{ fontSize: 13.5, fontWeight: 600, marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
+              {product.name}
+              {isBio && (
+                <span style={{ fontSize: 10.5, fontWeight: 700, color: 'var(--leaf-deep)', background: 'rgba(63,122,84,0.1)', padding: '2px 7px', borderRadius: 20 }}>
+                  🌱 Bio
+                </span>
+              )}
+            </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <button onClick={() => updateQuantity(product.id, quantity - 1)} style={{ width: 24, height: 24, borderRadius: 6, border: '1px solid var(--line)', background: 'var(--card)', fontSize: 12 }}>−</button>
+              <button onClick={() => updateQuantity(product.id, isBio, quantity - 1)} style={{ width: 24, height: 24, borderRadius: 6, border: '1px solid var(--line)', background: 'var(--card)', fontSize: 12 }}>−</button>
               <span style={{ fontFamily: 'JetBrains Mono', fontSize: 12.5 }}>{quantity} {product.unit}</span>
-              <button onClick={() => updateQuantity(product.id, quantity + 1)} style={{ width: 24, height: 24, borderRadius: 6, border: '1px solid var(--line)', background: 'var(--card)', fontSize: 12 }}>+</button>
+              <button onClick={() => updateQuantity(product.id, isBio, quantity + 1)} style={{ width: 24, height: 24, borderRadius: 6, border: '1px solid var(--line)', background: 'var(--card)', fontSize: 12 }}>+</button>
             </div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, fontWeight: 600 }}>{(product.price * quantity).toLocaleString()} F</div>
-            <button onClick={() => removeItem(product.id)} style={{ background: 'none', border: 'none', color: 'var(--tomato)', fontSize: 11, marginTop: 4 }}>Retirer</button>
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, fontWeight: 600, color: isBio ? 'var(--leaf-deep)' : 'var(--ink)' }}>
+              {(unitPrice({ product, isBio }) * quantity).toLocaleString()} F
+            </div>
+            <button onClick={() => removeItem(product.id, isBio)} style={{ background: 'none', border: 'none', color: 'var(--tomato)', fontSize: 11, marginTop: 4 }}>Retirer</button>
           </div>
         </div>
       ))}
