@@ -17,6 +17,10 @@ const IOS_APP_IDS = {
   maxit: '1494321079',     // Orange Max it – Mali
 };
 
+// Longueur minimale exigée pour la référence de transaction — limite les entrées
+// bidons ("ok", "123"), même si ça ne garantit pas que la référence est authentique.
+const MIN_REFERENCE_LENGTH = 6;
+
 function isAndroid() {
   return /android/i.test(navigator.userAgent);
 }
@@ -27,17 +31,17 @@ function isAppleDevice() {
 }
 
 export default function PaymentPanel({ amount, method, setMethod, paymentReference, setPaymentReference, paymentConfirmed, setPaymentConfirmed }) {
-  const { orangeMoneyNumber, waveNumber, moovMoneyNumber } = useSettings();
+  const { orangeMoneyNumber, waveNumber } = useSettings();
   const [copied, setCopied] = useState(false);
 
   const METHODS = [
-    { id: 'wave', label: 'Wave', icon: 'W', color: '#1DA1F2', number: waveNumber },
-    { id: 'moov_money', label: 'Moov Money', icon: 'MM', color: 'var(--indigo)', number: moovMoneyNumber },
-    { id: 'maxit', label: 'Max it (Orange Money)', icon: 'M', color: 'var(--tomato)', number: orangeMoneyNumber },
-    { id: 'cash_on_delivery', label: 'Paiement à la livraison', icon: '₣', color: 'var(--ochre)', number: null },
+    { id: 'wave', label: 'Wave', logo: waveLogo, color: '#1DA1F2', number: waveNumber },
+    { id: 'maxit', label: 'Max it (Orange Money)', logo: orangeMoneyLogo, color: '#FF6600', number: orangeMoneyNumber },
+    { id: 'cash_on_delivery', label: 'Paiement à la livraison', logo: null, icon: '₣', color: 'var(--ochre)', number: null },
   ];
   const selected = METHODS.find((m) => m.id === method) || METHODS[0];
   const requiresProof = method !== 'cash_on_delivery';
+  const referenceTooShort = paymentReference.trim().length > 0 && paymentReference.trim().length < MIN_REFERENCE_LENGTH;
 
   function copyNumber() {
     if (!selected.number) return;
@@ -47,11 +51,6 @@ export default function PaymentPanel({ amount, method, setMethod, paymentReferen
   }
 
   function openApp() {
-    if (method === 'moov_money') {
-      // Moov Money Mali passe par un vrai code USSD, fiable sur tous les téléphones
-      window.location.href = 'tel:*166%23';
-      return;
-    }
     const pkg = ANDROID_PACKAGES[method];
     const iosId = IOS_APP_IDS[method];
     if (pkg && isAndroid()) {
@@ -83,7 +82,27 @@ export default function PaymentPanel({ amount, method, setMethod, paymentReferen
             borderRadius: 12, marginBottom: 10, cursor: 'pointer'
           }}
         >
-          <div style={{ width: 34, height: 34, borderRadius: 9, background: m.color, color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12.5, fontWeight: 700 }}>{m.icon}</div>
+          <div style={{
+            width: 34, height: 34, borderRadius: 9, background: m.logo ? 'white' : m.color,
+            border: m.logo ? '1px solid var(--line)' : 'none',
+            color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 12.5, fontWeight: 700, overflow: 'hidden'
+          }}>
+            {m.logo ? (
+              <img
+                src={m.logo}
+                alt={m.label}
+                style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 4 }}
+                onError={(e) => {
+                  // Si l'image n'a pas été ajoutée dans src/assets/, on retombe sur une pastille de couleur avec initiale
+                  e.target.parentNode.style.background = m.color;
+                  e.target.parentNode.style.border = 'none';
+                  e.target.style.display = 'none';
+                  e.target.parentNode.textContent = m.label[0];
+                }}
+              />
+            ) : m.icon}
+          </div>
           <span style={{ fontSize: 13, fontWeight: 600 }}>{m.label}</span>
         </div>
       ))}
@@ -99,7 +118,7 @@ export default function PaymentPanel({ amount, method, setMethod, paymentReferen
             onClick={openApp}
             style={{ background: selected.color, color: 'white', border: 'none', borderRadius: 9, padding: '10px 16px', fontSize: 12.5, fontWeight: 600, cursor: 'pointer', marginBottom: 10, width: '100%' }}
           >
-            {method === 'moov_money' ? '📞 Composer le code Moov Money' : `📲 Ouvrir ${selected.label}`}
+            📲 Ouvrir {selected.label}
           </button>
 
           {selected.number ? (
@@ -110,7 +129,7 @@ export default function PaymentPanel({ amount, method, setMethod, paymentReferen
                 {copied ? '✓ Copié' : 'Copier'}
               </button>
             </div>
-          ) : method !== 'moov_money' && (
+          ) : (
             <p style={{ fontSize: 11.5, color: '#8A6116', marginBottom: 4 }}>Numéro pas encore configuré — contacte-nous directement.</p>
           )}
 
@@ -127,10 +146,16 @@ export default function PaymentPanel({ amount, method, setMethod, paymentReferen
             onChange={(e) => setPaymentReference(e.target.value)}
             placeholder="Ex : ID reçu par SMS après le paiement"
             style={{
-              width: '100%', padding: '9px 12px', borderRadius: 8, border: '1.5px solid #EBCFA0',
-              fontSize: 12.5, marginBottom: 12, boxSizing: 'border-box'
+              width: '100%', padding: '9px 12px', borderRadius: 8,
+              border: `1.5px solid ${referenceTooShort ? 'var(--tomato)' : '#EBCFA0'}`,
+              fontSize: 12.5, marginBottom: referenceTooShort ? 4 : 12, boxSizing: 'border-box'
             }}
           />
+          {referenceTooShort && (
+            <p style={{ fontSize: 11, color: 'var(--tomato)', marginBottom: 12 }}>
+              La référence doit contenir au moins {MIN_REFERENCE_LENGTH} caractères.
+            </p>
+          )}
 
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 9, cursor: 'pointer' }}>
             <input
