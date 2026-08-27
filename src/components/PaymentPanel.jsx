@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useSettings } from '../context/SettingsContext';
+import waveLogo from '../assets/wave-logo.png';
+import orangeMoneyLogo from '../assets/orange-money-logo.png';
 
 // Packages Android connus (pour tenter d'ouvrir l'app directement) — pas de lien officiel
 // documenté avec montant pré-rempli pour Wave/Max it, donc on ouvre juste l'app.
