@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import siteLogo from '../assets/logo.png';
 
 export default function NavBar() {
   const { user, logout } = useAuth();
@@ -10,6 +11,7 @@ export default function NavBar() {
   const navigate = useNavigate();
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
   const [open, setOpen] = useState(false);
+  const [logoFailed, setLogoFailed] = useState(false);
 
   const links = [
     { to: '/', label: 'Accueil' },
@@ -32,12 +34,21 @@ export default function NavBar() {
         position: 'sticky', top: 0, zIndex: 10
       }}>
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 30, height: 30, borderRadius: 7,
-            background: 'linear-gradient(135deg, var(--leaf), var(--tomato))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'Space Grotesk', fontWeight: 700, color: 'var(--indigo-deep)', fontSize: 15
-          }}>S</div>
+          {!logoFailed ? (
+            <img
+              src={siteLogo}
+              alt="SAFi"
+              style={{ width: 30, height: 30, borderRadius: 7, objectFit: 'cover' }}
+              onError={() => setLogoFailed(true)}
+            />
+          ) : (
+            <div style={{
+              width: 30, height: 30, borderRadius: 7,
+              background: 'linear-gradient(135deg, var(--leaf), var(--tomato))',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontFamily: 'Space Grotesk', fontWeight: 700, color: 'var(--indigo-deep)', fontSize: 15
+            }}>S</div>
+          )}
           <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 18 }}>SAFi</span>
         </Link>
 
