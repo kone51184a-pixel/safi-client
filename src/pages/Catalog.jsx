@@ -9,7 +9,6 @@ const TABS = [
   { key: 'all', label: 'Tous' },
   { key: 'Fruits', label: '🥭 Fruits' },
   { key: 'Légumes', label: '🍅 Légumes' },
-  { key: 'Bio', label: '🌱 Bio' },
 ];
 
 export default function Catalog() {
@@ -46,16 +45,14 @@ export default function Catalog() {
     setSearchParams(searchParams);
   }
 
-  // Le catalogue vend fruits, légumes, et les produits classés Bio
+  // Le catalogue vend fruits et légumes — chaque produit peut avoir un prix bio optionnel,
+  // affiché et choisi directement sur sa fiche produit.
   const produce = products.filter((p) =>
-    ['Fruits', 'Légumes', 'Bio'].includes(p.category_name)
+    ['Fruits', 'Légumes'].includes(p.category_name)
   );
   const filtered = tab === 'all'
     ? produce
-    : tab === 'Bio'
-      // Bio = catégorie "Bio" directe, OU produit Fruits/Légumes avec un prix bio renseigné
-      ? produce.filter((p) => p.category_name === 'Bio' || p.price_bio)
-      : produce.filter((p) => p.category_name === tab);
+    : produce.filter((p) => p.category_name === tab);
 
   return (
     <div style={{ maxWidth: 1100, margin: '0 auto', padding: '30px 24px' }}>
@@ -91,7 +88,7 @@ export default function Catalog() {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: 16 }}>
           {filtered.map((p) => (
-            <ProductCard key={p.id} product={p} bioContext={tab === 'Bio'} />
+            <ProductCard key={p.id} product={p} />
           ))}
         </div>
       )}

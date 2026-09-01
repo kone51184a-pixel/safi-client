@@ -8,8 +8,6 @@ const FRESH_CATEGORIES = [
   { name: 'Fruits', icon: '🥭', color: 'var(--leaf)', image: 'https://images.pexels.com/photos/3978830/pexels-photo-3978830.jpeg?auto=compress&cs=tinysrgb&w=200' },
 ];
 
-const BIO_CATEGORY = { name: 'Bio', icon: '🌱', color: 'var(--leaf-deep)', image: 'https://images.pexels.com/photos/1656663/pexels-photo-1656663.jpeg?auto=compress&cs=tinysrgb&w=200' };
-
 function CategoryTile({ c }) {
   return (
     <Link to={`/catalogue?categorie=${encodeURIComponent(c.name)}`} style={{ textAlign: 'center' }}>
@@ -72,14 +70,6 @@ export default function Home() {
         {FRESH_CATEGORIES.map((c) => <CategoryTile key={c.name} c={c} />)}
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
-        <span style={{ fontSize: 15 }}>🌱</span>
-        <h3 style={{ fontSize: 15, color: 'var(--leaf-deep)', fontFamily: 'JetBrains Mono', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Bio</h3>
-      </div>
-      <div style={{ display: 'flex', gap: 16, marginBottom: 34, flexWrap: 'wrap' }}>
-        <CategoryTile c={BIO_CATEGORY} />
-      </div>
-
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
         <h3 style={{ fontSize: 15, color: 'var(--ink-soft)', fontFamily: 'JetBrains Mono', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Disponible aujourd'hui</h3>
         <Link to="/catalogue" style={{ fontSize: 13, color: 'var(--tomato)', fontWeight: 600 }}>Voir tout →</Link>
@@ -102,13 +92,7 @@ export default function Home() {
   );
 }
 
-export function ProductCard({ product, bioContext }) {
-  // Si on affiche cette carte dans un contexte Bio et que ce produit a un prix bio distinct
-  // (produit Fruits/Légumes avec price_bio renseigné), on montre ce prix-là, bien identifié —
-  // sinon (produit classé directement en catégorie "Bio", ou contexte normal) on garde le prix standard.
-  const showBioPrice = bioContext && product.price_bio;
-  const displayPrice = showBioPrice ? product.price_bio : product.price;
-
+export function ProductCard({ product }) {
   return (
     <Link to={`/produit/${product.id}`} style={{
       background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 14, overflow: 'hidden'
@@ -120,18 +104,12 @@ export function ProductCard({ product, bioContext }) {
       </div>
       <div style={{ padding: '10px 12px 14px' }}>
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{product.name}</div>
-        {showBioPrice ? (
-          <div>
-            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--leaf-deep)', fontWeight: 700 }}>
-              🌱 {Number(product.price_bio).toLocaleString()} F/{product.unit}
-            </div>
-            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11, color: 'var(--ink-soft)', textDecoration: 'line-through' }}>
-              {Number(product.price).toLocaleString()} F non bio
-            </div>
-          </div>
-        ) : (
-          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--tomato)', fontWeight: 600 }}>
-            {Number(displayPrice).toLocaleString()} F/{product.unit}
+        <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--tomato)', fontWeight: 600 }}>
+          {Number(product.price).toLocaleString()} F/{product.unit}
+        </div>
+        {product.price_bio && (
+          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11.5, color: 'var(--leaf-deep)', fontWeight: 600, marginTop: 2 }}>
+            🌱 Bio : {Number(product.price_bio).toLocaleString()} F
           </div>
         )}
       </div>

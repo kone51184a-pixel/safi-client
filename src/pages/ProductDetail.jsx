@@ -24,12 +24,9 @@ export default function ProductDetail() {
   if (!product) return <p style={{ padding: 30, fontSize: 13, color: 'var(--ink-soft)' }}>Produit introuvable.</p>;
 
   const hasBioOption = Boolean(product.price_bio);
-  // Produit classé directement dans la catégorie "Bio" : son prix normal EST déjà le prix bio,
-  // pas besoin de choix supplémentaire.
-  const isDirectlyBioCategory = product.category_name === 'Bio';
 
   function handleAddToCart() {
-    addItem(product, quantity, isDirectlyBioCategory ? false : isBio);
+    addItem(product, quantity, isBio);
     navigate('/panier');
   }
 
@@ -44,26 +41,18 @@ export default function ProductDetail() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
         <div>
           <h2 style={{ fontSize: 22 }}>{product.name}</h2>
-          {isDirectlyBioCategory ? (
-            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 16, color: 'var(--leaf-deep)', fontWeight: 600, marginTop: 4 }}>
-              🌱 {Number(product.price).toLocaleString()} F / {product.unit}
+          <div style={{ fontFamily: 'JetBrains Mono', fontSize: 16, color: 'var(--tomato)', fontWeight: 600, marginTop: 4 }}>
+            {Number(product.price).toLocaleString()} F / {product.unit}
+          </div>
+          {hasBioOption && (
+            <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--leaf)', fontWeight: 600, marginTop: 2 }}>
+              🌱 Bio : {Number(product.price_bio).toLocaleString()} F / {product.unit}
             </div>
-          ) : (
-            <>
-              <div style={{ fontFamily: 'JetBrains Mono', fontSize: 16, color: 'var(--tomato)', fontWeight: 600, marginTop: 4 }}>
-                {Number(product.price).toLocaleString()} F / {product.unit}
-              </div>
-              {hasBioOption && (
-                <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--leaf)', fontWeight: 600, marginTop: 2 }}>
-                  🌱 Bio : {Number(product.price_bio).toLocaleString()} F / {product.unit}
-                </div>
-              )}
-            </>
           )}
         </div>
       </div>
 
-      {!isDirectlyBioCategory && hasBioOption && (
+      {hasBioOption && (
         <div style={{ marginBottom: 22 }}>
           <div style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', marginBottom: 8 }}>Version :</div>
           <div style={{ display: 'flex', gap: 10 }}>
