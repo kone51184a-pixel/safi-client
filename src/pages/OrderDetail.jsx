@@ -118,16 +118,6 @@ export default function OrderDetail() {
         </div>
       )}
 
-      {order.payment_method && (
-        <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 12, padding: 14, marginBottom: 24, fontSize: 12.5 }}>
-          <div style={{ fontWeight: 600, marginBottom: 4 }}>Paiement</div>
-          <div style={{ color: 'var(--ink-soft)' }}>
-            {order.payment_method === 'cash_on_delivery' ? 'À la livraison' : order.payment_method}
-            {order.payment_reference && <> — réf. <span className="mono">{order.payment_reference}</span></>}
-          </div>
-        </div>
-      )}
-
       <h3 style={{ fontSize: 13, fontFamily: 'JetBrains Mono', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 14 }}>Suivi</h3>
       <Timeline currentStatus={order.status} />
 
