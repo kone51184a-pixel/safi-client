@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
 import { StatusPill, Timeline, Button } from '../components/UI';
-import PaymentPanel from '../components/PaymentPanel';
 
 const CANCELLABLE = ['pending', 'awaiting_matching', 'confirmed', 'picked_up'];
 
@@ -19,7 +18,6 @@ export default function OrderDetail() {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('wave');
 
   async function load() {
     setLoading(true);
@@ -120,9 +118,13 @@ export default function OrderDetail() {
         </div>
       )}
 
-      {order.order_type === 'free_request' && Number(order.total) > 0 && !['delivered', 'cancelled'].includes(order.status) && (
-        <div style={{ marginBottom: 24 }}>
-          <PaymentPanel amount={Number(order.total)} method={paymentMethod} setMethod={setPaymentMethod} />
+      {order.payment_method && (
+        <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 12, padding: 14, marginBottom: 24, fontSize: 12.5 }}>
+          <div style={{ fontWeight: 600, marginBottom: 4 }}>Paiement</div>
+          <div style={{ color: 'var(--ink-soft)' }}>
+            {order.payment_method === 'cash_on_delivery' ? 'À la livraison' : order.payment_method}
+            {order.payment_reference && <> — réf. <span className="mono">{order.payment_reference}</span></>}
+          </div>
         </div>
       )}
 
