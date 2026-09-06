@@ -42,7 +42,6 @@ export default function DelivererResponse() {
 
   const isAccepted = order.deliverer_response === 'accepted';
   const isRefused = order.deliverer_response === 'refused';
-  const isDelivered = order.status === 'delivered';
 
   return (
     <div style={{ maxWidth: 420, margin: '40px auto', padding: '0 24px' }}>
@@ -73,21 +72,9 @@ export default function DelivererResponse() {
         </div>
       </div>
 
-      {isDelivered ? (
+      {isAccepted ? (
         <div style={{ background: '#DCEADD', color: 'var(--success)', borderRadius: 12, padding: 16, textAlign: 'center', fontWeight: 600 }}>
-          ✓ Livraison confirmée — merci !
-        </div>
-      ) : isAccepted ? (
-        <div>
-          <div style={{ background: '#DCEADD', color: 'var(--success)', borderRadius: 12, padding: 14, textAlign: 'center', fontWeight: 600, marginBottom: 12 }}>
-            ✓ Course acceptée — bonne route !
-          </div>
-          <Button variant="leaf" style={{ width: '100%' }} onClick={() => respond('delivered')} disabled={responding}>
-            {responding ? '…' : 'J\'ai livré ✓'}
-          </Button>
-          <p style={{ fontSize: 11, color: 'var(--ink-soft)', textAlign: 'center', marginTop: 8 }}>
-            Clique seulement une fois la livraison faite chez le client.
-          </p>
+          ✓ Course acceptée — bonne route !
         </div>
       ) : isRefused ? (
         <div style={{ background: '#F5DADA', color: 'var(--tomato)', borderRadius: 12, padding: 16, textAlign: 'center', fontWeight: 600 }}>
