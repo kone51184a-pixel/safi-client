@@ -12,6 +12,7 @@ export default function ProductDetail() {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [budget, setBudget] = useState('');
   const [isBio, setIsBio] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -24,9 +25,15 @@ export default function ProductDetail() {
   if (!product) return <p style={{ padding: 30, fontSize: 13, color: 'var(--ink-soft)' }}>Produit introuvable.</p>;
 
   const hasBioOption = Boolean(product.price_bio);
+  const isVegetable = product.category_name === 'Légumes';
+  const selectedPrice = (isBio && product.price_bio) ? Number(product.price_bio) : Number(product.price);
+  const budgetAmount = Number(budget);
+  const budgetQuantity = budgetAmount > 0 && selectedPrice > 0 ? budgetAmount / selectedPrice : 0;
+  const usesWholeUnits = product.unit === 'piece' || product.unit === 'pièce';
+  const budgetIsValid = !isVegetable || (budgetQuantity > 0 && (!usesWholeUnits || Number.isInteger(budgetQuantity)));
 
   function handleAddToCart() {
-    addItem(product, quantity, isBio);
+    addItem(product, isVegetable ? budgetQuantity : quantity, isBio);
     navigate('/panier');
   }
 
@@ -84,20 +91,47 @@ export default function ProductDetail() {
         </div>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)' }}>Quantité :</span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <button onClick={() => setQuantity(Math.max(1, quantity - 1))} style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid var(--line)', background: 'var(--card)' }}>−</button>
-          <span style={{ fontFamily: 'JetBrains Mono', fontSize: 14 }}>{quantity} {formatUnit(product.unit, quantity)}</span>
-          <button onClick={() => setQuantity(quantity + 1)} style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid var(--line)', background: 'var(--card)' }}>+</button>
+      {isVegetable ? (
+        <div style={{ background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 12, padding: 14, marginBottom: 22 }}>
+          <label style={{ display: 'block', fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)', marginBottom: 8 }}>
+            Quel montant veux-tu de {product.name.toLowerCase()} ?
+          </label>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <input
+              type="number"
+              min="1"
+              step="1"
+              value={budget}
+              onChange={(e) => setBudget(e.target.value)}
+              placeholder="Ex : 1000"
+              style={{ flex: 1, padding: '11px 12px', borderRadius: 9, border: '1.5px solid var(--line)', fontSize: 14, background: 'var(--cream)', color: 'var(--ink)' }}
+            />
+            <span style={{ fontWeight: 700, color: 'var(--tomato)' }}>FCFA</span>
+          </div>
+          {budgetQuantity > 0 && (
+            <p style={{ fontSize: 12, color: budgetIsValid ? 'var(--success)' : 'var(--tomato)', marginTop: 8 }}>
+              {budgetIsValid
+                ? `Cela correspond à ${budgetQuantity} ${formatUnit(product.unit, budgetQuantity)}.`
+                : `Le montant doit être un multiple de ${selectedPrice.toLocaleString()} F pour obtenir un nombre entier d'articles.`}
+            </p>
+          )}
         </div>
-      </div>
+      ) : (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 22 }}>
+          <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--ink-soft)' }}>Quantité :</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid var(--line)', background: 'var(--card)' }}>−</button>
+            <span style={{ fontFamily: 'JetBrains Mono', fontSize: 14 }}>{quantity} {formatUnit(product.unit, quantity)}</span>
+            <button onClick={() => setQuantity(quantity + 1)} style={{ width: 30, height: 30, borderRadius: 8, border: '1px solid var(--line)', background: 'var(--card)' }}>+</button>
+          </div>
+        </div>
+      )}
 
       {product.description && (
         <p style={{ fontSize: 13, color: 'var(--ink-soft)', lineHeight: 1.6, marginBottom: 24 }}>{product.description}</p>
       )}
 
-      <Button onClick={handleAddToCart} style={{ width: '100%' }}>Ajouter au panier</Button>
+      <Button onClick={handleAddToCart} disabled={!budgetIsValid} style={{ width: '100%' }}>Ajouter au panier</Button>
     </div>
   );
 }
