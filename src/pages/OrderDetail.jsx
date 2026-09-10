@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
-import { StatusPill, Timeline, Button } from '../components/UI';
+import { StatusPill, Timeline, Button, STATUS_LABELS } from '../components/UI';
 
 const CANCELLABLE = ['pending', 'awaiting_matching', 'confirmed', 'picked_up'];
 
@@ -120,6 +120,20 @@ export default function OrderDetail() {
 
       <h3 style={{ fontSize: 13, fontFamily: 'JetBrains Mono', textTransform: 'uppercase', color: 'var(--ink-soft)', marginBottom: 14 }}>Suivi</h3>
       <Timeline currentStatus={order.status} />
+
+      {order.history?.length > 0 && (
+        <div style={{ marginTop: 4, paddingTop: 16, borderTop: '1px solid var(--line)' }}>
+          <h3 style={{ fontSize: 13, marginBottom: 10 }}>Dernières mises à jour</h3>
+          {order.history.map((event) => (
+            <div key={event.id} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, padding: '8px 0', borderBottom: '1px solid var(--line)', fontSize: 12 }}>
+              <span>{STATUS_LABELS[event.status] || event.status}</span>
+              <span style={{ color: 'var(--ink-soft)', whiteSpace: 'nowrap' }}>
+                {new Date(event.created_at).toLocaleDateString('fr-FR')}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {error && <p style={{ color: 'var(--tomato)', fontSize: 12, margin: '12px 0' }}>{error}</p>}
 

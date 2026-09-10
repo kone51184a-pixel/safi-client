@@ -56,10 +56,10 @@ export function StatusPill({ status }) {
   );
 }
 
-const STATUS_ORDER = ['pending', 'confirmed', 'picked_up', 'in_delivery', 'delivered'];
-const STATUS_LABELS = {
+const STATUS_ORDER = ['pending', 'awaiting_matching', 'confirmed', 'picked_up', 'in_delivery', 'delivered'];
+export const STATUS_LABELS = {
   pending: 'Demande reçue',
-  awaiting_matching: 'Demande reçue',
+  awaiting_matching: 'Recherche d’un vendeur',
   confirmed: 'Commande confirmée',
   picked_up: 'En préparation',
   in_delivery: 'En livraison',
@@ -67,7 +67,7 @@ const STATUS_LABELS = {
 };
 
 export function Timeline({ currentStatus }) {
-  const currentIndex = STATUS_ORDER.indexOf(currentStatus === 'awaiting_matching' ? 'pending' : currentStatus);
+  const currentIndex = STATUS_ORDER.indexOf(currentStatus);
   return (
     <div style={{ padding: '4px 0' }}>
       {STATUS_ORDER.map((status, i) => {
