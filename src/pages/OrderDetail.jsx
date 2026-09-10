@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
-import { StatusPill, Timeline, Button, STATUS_LABELS } from '../components/UI';
+import { StatusPill, Timeline, Button, STATUS_LABELS, formatUnit } from '../components/UI';
 
 const CANCELLABLE = ['pending', 'awaiting_matching', 'confirmed', 'picked_up'];
 
@@ -87,7 +87,7 @@ export default function OrderDetail() {
         <div style={{ marginBottom: 16 }}>
           {order.items.map((item) => (
             <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid var(--line)', fontSize: 13 }}>
-              <span>{item.product_name} <span style={{ color: 'var(--ink-soft)' }}>× {item.quantity}</span></span>
+              <span>{item.product_name} <span style={{ color: 'var(--ink-soft)' }}>× {item.quantity} {formatUnit(item.unit, item.quantity)}</span></span>
               <span className="mono">{Number(item.line_total).toLocaleString()} F</span>
             </div>
           ))}

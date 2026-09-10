@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useSettings } from '../context/SettingsContext';
-import { Button } from '../components/UI';
+import { Button, formatUnit } from '../components/UI';
 
 export default function Cart() {
   const { items, updateQuantity, removeItem, subtotal, unitPrice } = useCart();
@@ -43,7 +43,7 @@ export default function Cart() {
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
               <button onClick={() => updateQuantity(product.id, isBio, quantity - 1)} style={{ width: 24, height: 24, borderRadius: 6, border: '1px solid var(--line)', background: 'var(--card)', fontSize: 12 }}>−</button>
-              <span style={{ fontFamily: 'JetBrains Mono', fontSize: 12.5 }}>{quantity} {product.unit}</span>
+              <span style={{ fontFamily: 'JetBrains Mono', fontSize: 12.5 }}>{quantity} {formatUnit(product.unit, quantity)}</span>
               <button onClick={() => updateQuantity(product.id, isBio, quantity + 1)} style={{ width: 24, height: 24, borderRadius: 6, border: '1px solid var(--line)', background: 'var(--card)', fontSize: 12 }}>+</button>
             </div>
           </div>

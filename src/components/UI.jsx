@@ -35,6 +35,11 @@ export const inputStyle = {
   fontSize: 13.5, background: 'var(--card)', color: 'var(--ink)',
 };
 
+export function formatUnit(unit, quantity = 1) {
+  if (unit === 'piece') return Number(quantity) === 1 ? 'article' : 'articles';
+  return unit || 'unité';
+}
+
 export function StatusPill({ status }) {
   const map = {
     pending: { bg: '#F3E4C4', color: '#8A6116', label: 'En attente' },

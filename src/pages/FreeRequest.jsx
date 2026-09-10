@@ -3,10 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 import { api } from '../api/client';
-import { Button, Field, inputStyle } from '../components/UI';
+import { Button, Field, inputStyle, formatUnit } from '../components/UI';
 import PaymentPanel from '../components/PaymentPanel';
-
-const MIN_KG = 40;
 
 export default function FreeRequest() {
   const { token } = useAuth();
@@ -35,11 +33,10 @@ export default function FreeRequest() {
     return (i.isBio && i.product.price_bio) ? Number(i.product.price_bio) : Number(i.product.price);
   }
 
-  const totalKg = items.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = items.reduce((sum, i) => sum + itemPrice(i) * i.quantity, 0);
   const tvaAmount = Math.round(subtotal * (tvaRate / 100));
   const total = subtotal + deliveryFee + tvaAmount;
-  const reachedMin = totalKg >= MIN_KG;
+  const hasQuantities = items.length > 0 && items.every((item) => Number(item.quantity) > 0);
 
   const selectedProduct = products.find((p) => p.id === selectedProductId);
   const canAddBio = Boolean(selectedProduct?.price_bio);
@@ -48,7 +45,7 @@ export default function FreeRequest() {
   // Toute autre méthode : référence de transaction (6 caractères min.) + case cochée obligatoires.
   const requiresProof = method !== 'cash_on_delivery';
   const paymentReady = !requiresProof || (paymentReference.trim().length >= 6 && paymentConfirmed);
-  const canSubmit = reachedMin && items.length > 0 && address.trim() !== '' && paymentReady && !loading;
+  const canSubmit = hasQuantities && address.trim() !== '' && paymentReady && !loading;
 
   function addItem() {
     if (!selectedProductId || !addQuantity || Number(addQuantity) <= 0) return;
@@ -106,7 +103,7 @@ export default function FreeRequest() {
     <div style={{ maxWidth: 480, margin: '0 auto', padding: '30px 24px' }}>
       <h2 style={{ fontSize: 20 }}>Commande en gros</h2>
       <p style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 4, marginBottom: 22 }}>
-        Choisis tes produits et quantités — minimum {MIN_KG} kg au total. Le prix se calcule automatiquement.
+        Choisis les produits et les quantités souhaitées. Chaque produit garde sa propre unité de vente.
       </p>
 
       <Field label="Ajouter un produit">
@@ -114,13 +111,13 @@ export default function FreeRequest() {
           <select style={{ ...inputStyle, flex: 1 }} value={selectedProductId} onChange={(e) => { setSelectedProductId(e.target.value); setAddIsBio(false); }}>
             <option value="">— Choisir —</option>
             {products.map((p) => (
-              <option key={p.id} value={p.id}>{p.name} ({Number(p.price).toLocaleString()} F/{p.unit})</option>
+              <option key={p.id} value={p.id}>{p.name} ({Number(p.price).toLocaleString()} F/{formatUnit(p.unit)})</option>
             ))}
           </select>
           <input
             style={{ ...inputStyle, width: 80 }}
             type="number"
-            placeholder="kg"
+            placeholder={selectedProduct ? formatUnit(selectedProduct.unit) : 'quantité'}
             value={addQuantity}
             onChange={(e) => setAddQuantity(e.target.value)}
           />
@@ -130,7 +127,7 @@ export default function FreeRequest() {
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
             <input type="checkbox" checked={addIsBio} onChange={(e) => setAddIsBio(e.target.checked)} />
             <span style={{ fontSize: 12, color: 'var(--leaf-deep)', fontWeight: 600 }}>
-              🌱 Version bio ({Number(selectedProduct.price_bio).toLocaleString()} F/{selectedProduct.unit})
+              🌱 Version bio ({Number(selectedProduct.price_bio).toLocaleString()} F/{formatUnit(selectedProduct.unit)})
             </span>
           </label>
         )}
@@ -147,7 +144,7 @@ export default function FreeRequest() {
                     <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--leaf-deep)', background: 'rgba(63,122,84,0.1)', padding: '1px 6px', borderRadius: 20 }}>🌱 Bio</span>
                   )}
                 </div>
-                <div style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>{i.quantity} {i.product.unit}</div>
+                <div style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>{i.quantity} {formatUnit(i.product.unit, i.quantity)}</div>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <span className="mono" style={{ fontSize: 13 }}>
@@ -157,8 +154,8 @@ export default function FreeRequest() {
               </div>
             </div>
           ))}
-          <div style={{ marginTop: 8, fontSize: 12.5, fontWeight: 600, color: reachedMin ? 'var(--success)' : 'var(--tomato)' }}>
-            Total : {totalKg} kg {reachedMin ? '✓' : `(encore ${MIN_KG - totalKg} kg pour atteindre le minimum de ${MIN_KG} kg)`}
+          <div style={{ marginTop: 8, fontSize: 12.5, fontWeight: 600, color: hasQuantities ? 'var(--success)' : 'var(--tomato)' }}>
+            Quantités sélectionnées ✓
           </div>
         </div>
       )}
@@ -193,7 +190,7 @@ export default function FreeRequest() {
         </div>
       )}
 
-      {reachedMin && items.length > 0 && (
+      {hasQuantities && (
         <PaymentPanel
           amount={total}
           method={method}
@@ -215,7 +212,7 @@ export default function FreeRequest() {
       >
         {loading ? 'Envoi…' : 'Confirmer la commande'}
       </Button>
-      {reachedMin && items.length > 0 && requiresProof && !paymentReady && (
+      {hasQuantities && requiresProof && !paymentReady && (
         <p style={{ fontSize: 11, color: 'var(--tomato)', textAlign: 'center', marginTop: 8 }}>
           Renseigne la référence de paiement et coche la case pour pouvoir commander.
         </p>
