@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
+import logo from '../assets/logo.png';
 
 export default function NavBar() {
   const { user, logout } = useAuth();
@@ -32,12 +33,17 @@ export default function NavBar() {
         position: 'sticky', top: 0, zIndex: 10
       }}>
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{
-            width: 30, height: 30, borderRadius: 7,
-            background: 'linear-gradient(135deg, var(--leaf), var(--tomato))',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'Space Grotesk', fontWeight: 700, color: 'var(--indigo-deep)', fontSize: 15
-          }}>S</div>
+          <img
+            src={logo}
+            alt="SAFi logo"
+            style={{
+              width: 30,
+              height: 30,
+              objectFit: 'contain',
+              borderRadius: 7,
+              display: 'block'
+            }}
+          />
           <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 18 }}>SAFi</span>
         </Link>
 
