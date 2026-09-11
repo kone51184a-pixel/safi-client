@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../api/client';
-import { formatUnit } from '../components/UI';
 
 const FRESH_CATEGORIES = [
   { name: 'Légumes', icon: '🍅', color: 'var(--tomato)', image: 'https://images.pexels.com/photos/1400172/pexels-photo-1400172.jpeg?auto=compress&cs=tinysrgb&w=200' },
@@ -83,7 +82,7 @@ export default function Home() {
       ) : freshProducts.length === 0 ? (
         <p style={{ fontSize: 13, color: 'var(--ink-soft)' }}>Aucun produit disponible pour l'instant.</p>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
           {freshProducts.slice(0, 8).map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
@@ -106,7 +105,7 @@ export function ProductCard({ product }) {
       <div style={{ padding: '10px 12px 14px' }}>
         <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{product.name}</div>
         <div style={{ fontFamily: 'JetBrains Mono', fontSize: 13, color: 'var(--tomato)', fontWeight: 600 }}>
-          {Number(product.price).toLocaleString()} F/{formatUnit(product.unit)}
+          {Number(product.price).toLocaleString()} F/{product.unit}
         </div>
         {product.price_bio && (
           <div style={{ fontFamily: 'JetBrains Mono', fontSize: 11.5, color: 'var(--leaf-deep)', fontWeight: 600, marginTop: 2 }}>

@@ -86,7 +86,7 @@ export default function Catalog() {
       ) : filtered.length === 0 ? (
         <p style={{ fontSize: 13, color: 'var(--ink-soft)' }}>Aucun produit trouvé.</p>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 12 }}>
           {filtered.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
