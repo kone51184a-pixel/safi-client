@@ -33,17 +33,29 @@ export default function NavBar() {
         position: 'sticky', top: 0, zIndex: 10
       }}>
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <img
-            src={logo}
-            alt="SAFi logo"
-            style={{
-              width: 30,
-              height: 30,
-              objectFit: 'contain',
-              borderRadius: 7,
-              display: 'block'
-            }}
-          />
+          <div style={{
+            width: 42,
+            height: 42,
+            borderRadius: 12,
+            background: 'rgba(255,255,255,0.12)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 6,
+            boxSizing: 'border-box'
+          }}>
+            <img
+              src={logo}
+              alt="SAFi logo"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'contain',
+                display: 'block'
+              }}
+            />
+          </div>
           <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: 18 }}>SAFi</span>
         </Link>
 
