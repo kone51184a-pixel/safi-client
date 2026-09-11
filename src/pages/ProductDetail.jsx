@@ -29,7 +29,7 @@ export default function ProductDetail() {
   const selectedPrice = (isBio && product.price_bio) ? Number(product.price_bio) : Number(product.price);
   const budgetAmount = Number(budget);
   const budgetQuantity = budgetAmount > 0 && selectedPrice > 0 ? budgetAmount / selectedPrice : 0;
-  const usesWholeUnits = product.unit === 'piece' || product.unit === 'pièce';
+  const usesWholeUnits = product.unit === 'piece' || product.unit === 'pièce' || product.unit === 'article';
   const budgetIsValid = !isVegetable || (budgetQuantity > 0 && (!usesWholeUnits || Number.isInteger(budgetQuantity)));
 
   function handleAddToCart() {

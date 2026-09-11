@@ -37,6 +37,7 @@ export const inputStyle = {
 
 export function formatUnit(unit, quantity = 1) {
   if (unit === 'piece' || unit === 'pièce') return Number(quantity) === 1 ? 'article' : 'articles';
+  if (unit === 'article') return Number(quantity) === 1 ? 'article' : 'articles';
   return unit || 'unité';
 }
 
